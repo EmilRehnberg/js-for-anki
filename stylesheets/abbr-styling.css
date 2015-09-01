@@ -1,0 +1,6 @@
+abbr:after {
+  content: attr(id);
+  text-transform: uppercase;
+}
+abbr:hover:after { text-transform: capitalize; }
+abbr#omg:hover:after { content: "Oh My God"; }
