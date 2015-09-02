@@ -1,72 +1,55 @@
-var tableFunctions = {
-  insertToDoc: insertToDoc
-};
+define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
+  return { insertToDoc: insertToDoc };
 
-define(function(tables){ return tableFunctions; });
-
-function insertToDoc(data) {
-  var table = document.createElement("table");
-  table = insertTableClass(table, data.tableClass);
-  table = insertTableCaption(table, data.caption);
-  table = insertTableHeader(table, data.header);
-  table = insertTableData(table, data.tableData);
-  insertTableToDocument(table, data);
-}
-
-function insertTableHeader(table, header){
-  var headerRow = table.insertRow(0);
-  headerRow.insertCell(0);
-  for (var headerNum in header){
-    var colName = header[headerNum];
-    var th = createTableHeaderTag(colName);
-    headerRow.appendChild(th);
+  function insertToDoc(data) {
+    var table = tagBuilders.buildTable();
+    insertTableClass(table, data.tableClass);
+    insertTableCaption(table, data.caption);
+    insertTableHeader(table, data.header);
+    insertTableData(table, data.tableData);
+    insertTableToDocument(table, data);
   }
-  return table;
-}
 
-function insertTableClass(table, tableClass){
-  if (tableClass) {
-    table.className = tableClass;
-  }
-  return table;
-}
-
-function insertTableCaption(table, caption){
-  if (caption) {
-    var captionTag = createCaptionTag(caption);
-    table.appendChild(captionTag);
-  }
-  return table;
-}
-
-function insertTableData(table, data){
-  var keys = Object.keys(tableData);
-  for (var rowName in tableData) {
-    var row = table.insertRow(-1);
-    var th = createTableHeaderTag(rowName);
-    row.appendChild(th);
-
-    for (var colNum in tableData[rowName]){
-      var td = createTableDataTag(tableData[rowName][colNum]);
-      row.appendChild(td);
+  function insertTableClass(table, tableClass){
+    if (tableClass) {
+      table.className = tableClass;
     }
-  };
-  return table;
-}
+  }
 
-function insertTableToDocument(table, options){
-  var insertId = options.id || "additional";
-  document.getElementById(insertId).insertAdjacentElement('beforeEnd', table);
-}
+  function insertTableCaption(table, caption){
+    if (caption) {
+      var captionTag = tagBuilders.createCaptionTag(caption);
+      table.appendChild(captionTag);
+    }
+  }
 
-function createTableHeaderTag(content){
-  var th = document.createElement('th');
-  th.innerHTML = content;
-  return th;
-}
+  function insertTableHeader(table, header){
+    var headerRow = table.insertRow(0);
+    headerRow.insertCell(0);
+    fillOutTableRow(headerRow, header, tagBuilders.buildTableHeader);
+  }
 
-function createTableDataTag(content){
-  var td = document.createElement('td');
-  td.innerHTML = content;
-  return td;
-}
+  function insertTableData(table, tableData){
+    var keys = Object.keys(tableData);
+    for (var rowName in tableData) {
+      var row = table.insertRow(-1);
+      var th = tagBuilders.buildTableHeader(rowName);
+      row.appendChild(th);
+      var rowData = tableData[rowName];
+      fillOutTableRow(row, rowData, tagBuilders.buildTableData);
+    };
+  }
+
+  function insertTableToDocument(table, options){
+    var insertId = options.id || "additional";
+    writers.appendTags(insertId, [table]);
+  }
+
+  function fillOutTableRow(row, data, builder){
+    for (var colNum in data){
+      var cellData = data[colNum];
+      var cell = builder(cellData);
+      row.appendChild(cell);
+    }
+  }
+});
