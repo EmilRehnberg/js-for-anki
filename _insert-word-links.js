@@ -1,6 +1,6 @@
-var outId = "wordLinks";
+var outId = "word-links-writer";
 require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers"], function(tagBuilders, domReaders, domWriters, arrayHelpers){
-  var wordElementsIds = domReaders.readWords(["linkIds"]);
+  var wordElementsIds = domReaders.readWords(["link-reader-ids"]);
   var words = domReaders.readWords(wordElementsIds);
   if (words.length == 0) { return; }
   var wordATags = mkWordATags(words);
