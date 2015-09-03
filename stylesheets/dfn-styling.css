@@ -1,0 +1,143 @@
+body {
+  background-color: black;
+  color: white;
+}
+
+dfn {
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: none;
+  color: LawnGreen;
+  white-space: pre-wrap; }
+
+dfn:after {
+  content: attr(id);
+  color: Khaki; }
+
+dfn.definition:after {
+  color: LawnGreen; }
+
+dfn:before {
+  color: orange; }
+
+del > dfn:after {
+  color: DarkCyan; }
+
+del > dfn:before {
+  color: #596F2F; }
+
+dfn#若し:before {
+  content: attr(id); }
+
+dfn#若し:after {
+  content: "〔もし〕まだ現実になっていないことを仮に想定するさま。もしか。万一。「―彼が来たら、知らせてください」\a"; }
+
+dfn.en#若し:after {
+  content: "：if; provided; in case (of emergency)\a"; }
+
+dfn.reading#若し:after {
+  content: "〔もし〕"; }
+
+dfn.definition#若し:before {
+  content: ""; }
+
+dfn.definition#若し:after {
+  content: "まだ現実になっていないことを仮に想定するさま。もしか。万一。「―彼が来たら、知らせてください」\a"; }
+
+dfn#養う2:before {
+  content: attr(id); }
+
+dfn#養う2:after {
+  content: "〔やしなう〕養育する\a"; }
+
+dfn.en#養う2:after {
+  content: "：bring up; rear; raise\a"; }
+
+dfn.reading#養う2:after {
+  content: "〔やしなう〕"; }
+
+dfn.definition#養う2:before {
+  content: ""; }
+
+dfn.definition#養う2:after {
+  content: "養育する\a"; }
+
+dfn#より1:before {
+  content: attr(id); }
+
+dfn#より1:after {
+  content: "：比較の標準・基準を表す。「思ったー若い」\a"; }
+
+dfn.en#より1:after {
+  content: "：(younger) than (you); (better) than (movies); (looks younger) than (her age); (rather have tea) than (coffee)\a"; }
+
+dfn.reading#より1:after {
+  content: "："; }
+
+dfn.definition#より1:before {
+  content: ""; }
+
+dfn.definition#より1:after {
+  content: "比較の標準・基準を表す。「思ったー若い」\a"; }
+
+dfn#より2:before {
+  content: attr(id); }
+
+dfn#より2:after {
+  content: "：ある事物を、他との比較・対照としてとりあげる意を表す。「僕ー君のほうが金持ちだ」「音楽ー美術の道へ進みたい」\a"; }
+
+dfn.en#より2:after {
+  content: "：even (harder/taller);\a"; }
+
+dfn.reading#より2:after {
+  content: "："; }
+
+dfn.definition#より2:before {
+  content: ""; }
+
+dfn.definition#より2:after {
+  content: "ある事物を、他との比較・対照としてとりあげる意を表す。「僕ー君のほうが金持ちだ」「音楽ー美術の道へ進みたい」\a"; }
+
+dfn#恋愛:before {
+  content: attr(id); }
+
+dfn#恋愛:after {
+  content: "〔れんあい〕特定の異性に特別の愛情を感じて恋い慕うこと。また、男女が互いにそのような感情をもつこと。「熱烈にーする」\a"; }
+
+dfn.en#恋愛:after {
+  content: "：love\a"; }
+
+dfn.reading#恋愛:after {
+  content: "〔れんあい〕"; }
+
+dfn.definition#恋愛:before {
+  content: ""; }
+
+dfn.definition#恋愛:after {
+  content: "特定の異性に特別の愛情を感じて恋い慕うこと。また、男女が互いにそのような感情をもつこと。「熱烈にーする」\a"; }
+
+dfn#浪費癖:before {
+  content: attr(id); }
+
+dfn#浪費癖:after {
+  content: "〔ろうひぐせ〕金銭をむだに使うくせ\a"; }
+
+dfn.en#浪費癖:after {
+  content: "：Extravagant spending habits\a"; }
+
+dfn.reading#浪費癖:after {
+  content: "〔ろうひぐせ〕"; }
+
+dfn.definition#浪費癖:before {
+  content: ""; }
+
+dfn.definition#浪費癖:after {
+  content: "金銭をむだに使うくせ\a"; }
+
+dfn#牛島辰熊:hover:after {
+  color: #AA0;
+  content: "牛島辰熊〔うしじま・たつくま〕柔道史上最強を謳われる木村政彦の師匠として有名だ〈柔道家〉"; }
+
+dfn#大山倍達:hover:after {
+  color: #AA0;
+  content: "大山倍達〔おおやまますたつ〕極真会創設者〈空手家〉"; }
