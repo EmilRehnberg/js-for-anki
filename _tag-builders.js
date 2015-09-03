@@ -1,12 +1,16 @@
 
 var moduleFunctions = {
   buildAnchor: buildAnchor,
+  buildDfn: buildDfn,
+  buildJaDfnTag: buildJaDfnTag,
+  buildReadingDfnTag: buildReadingDfnTag,
+  buildNameDfnTag: buildNameDfnTag,
+  buildEnDfnTag: buildEnDfnTag,
   buildSpan: buildSpan,
   buildTable: buildTable,
   createCaptionTag: createCaptionTag,
   buildTableData: buildTableData,
   buildTableHeader: buildTableHeader,
-  buildTableData: buildTableData,
   builder: builder
 };
 
@@ -17,6 +21,14 @@ function buildAnchor(content, url) {
   anchor.href = url;
   return anchor;
 }
+
+function buildDfn(entity, opt){
+  var dfnTag = builder("dfn")();
+  dfnTag.id = entity;
+  if (opt.classAttr != undefined) { dfnTag.className = opt.classAttr; }
+  dfnTag.innerHTML = (opt.tagContent == undefined) ? "" : opt.tagContent;
+  return dfnTag;
+};
 
 function buildSpan(content){
   return builder("span", content)();
@@ -44,4 +56,20 @@ function builder(tagName, content){
     if (content){ tag.innerHTML = content; }
     return tag;
   }
+}
+
+function buildJaDfnTag(word){
+  return buildDfn(word, {});
+}
+
+function buildNameDfnTag(name){
+  return buildDfn(name, {tagContent: "+"});
+}
+
+function buildReadingDfnTag(word){
+  return buildDfn(word, {classAttr: "reading"});
+}
+
+function buildEnDfnTag(word){
+  return buildDfn(word, {classAttr: "en"});
 }
