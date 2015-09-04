@@ -3,6 +3,7 @@ var moduleFunctions = {
   buildAnchor: buildAnchor,
   buildDetailsTag: buildDetailsTag,
   buildDfn: buildDfn,
+  buildDefDfn: buildDefDfn,
   buildJaDfnTag: buildJaDfnTag,
   buildReadingDfnTag: buildReadingDfnTag,
   buildNameDfnTag: buildNameDfnTag,
@@ -12,6 +13,7 @@ var moduleFunctions = {
   createCaptionTag: createCaptionTag,
   buildTableData: buildTableData,
   buildTableHeader: buildTableHeader,
+  buildWriterP: buildWriterP,
   builder: builder
 };
 
@@ -73,6 +75,16 @@ function buildReadingDfnTag(word){
 
 function buildEnDfnTag(word){
   return buildDfn(word, {classAttr: "en"});
+}
+
+function buildDefDfn(word){
+  return buildDfn(word, {classAttr: "definition"});
+}
+
+function buildWriterP(id){
+  var pTag = builder("p")();
+  pTag.id = id;
+  return pTag;
 }
 
 function buildDetailsTag(detailsText, summaryText){
