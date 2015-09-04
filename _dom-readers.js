@@ -1,5 +1,6 @@
 var domReadersFunctions = {
-  readWords: readWords
+  readWords: readWords,
+  readTagContents: readTagContents,
 };
 
 define(function(readers){ return domReadersFunctions; });
