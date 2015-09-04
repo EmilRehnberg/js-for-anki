@@ -1,6 +1,7 @@
 
 var moduleFunctions = {
   buildAnchor: buildAnchor,
+  buildDetailsTag: buildDetailsTag,
   buildDfn: buildDfn,
   buildJaDfnTag: buildJaDfnTag,
   buildReadingDfnTag: buildReadingDfnTag,
@@ -72,4 +73,13 @@ function buildReadingDfnTag(word){
 
 function buildEnDfnTag(word){
   return buildDfn(word, {classAttr: "en"});
+}
+
+function buildDetailsTag(detailsText, summaryText){
+  var detailsElement = builder("details", detailsText)();
+  if (Boolean(summaryText)){
+    var summaryElement = builder("summary", summaryText)();
+    detailsElement.insertAdjacentElement('afterBegin', summaryElement);
+  }
+  return detailsElement;
 }
