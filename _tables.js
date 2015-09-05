@@ -1,13 +1,13 @@
-define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
-  return { insertToDoc: insertToDoc };
+define(["_tag-builders"], function(tagBuilders){
+  return { buildDataTable: buildDataTable };
 
-  function insertToDoc(data) {
+  function buildDataTable(data) {
     var table = tagBuilders.buildTable();
     insertTableClass(table, data.tableClass);
     insertTableCaption(table, data.caption);
     insertTableHeader(table, data.header);
     insertTableData(table, data.tableData);
-    insertTableToDocument(table, data);
+    return table;
   }
 
   function insertTableClass(table, tableClass){
@@ -38,11 +38,6 @@ define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
       var rowData = tableData[rowName];
       fillOutTableRow(row, rowData, tagBuilders.buildTableData);
     };
-  }
-
-  function insertTableToDocument(table, options){
-    var insertId = options.id || "additional";
-    writers.appendTags(insertId, [table]);
   }
 
   function fillOutTableRow(row, data, builder){

@@ -29,4 +29,7 @@ for (language in adjacentCodeExamples) {
   }
 };
 
-require(["_tables"], function(tables){ tables.insertToDoc(data); });
+require(["_tables", "_dom-writers"], function(tables, writers){
+  var tableMarkUp = tables.buildDataTable(data);
+  writers.appendToFirstArticle(tableMarkUp);
+});
