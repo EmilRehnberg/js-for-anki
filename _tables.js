@@ -1,5 +1,10 @@
-define(["_tag-builders"], function(tagBuilders){
-  return { buildDataTable: buildDataTable };
+define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
+  return { writeTable: writeTable };
+
+  function writeTable(data){
+    var table = buildDataTable(data);
+    writers.appendToFirstArticle(table);
+  }
 
   function buildDataTable(data) {
     var table = tagBuilders.buildTable();
