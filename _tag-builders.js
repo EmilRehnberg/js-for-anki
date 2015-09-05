@@ -8,6 +8,7 @@ var moduleFunctions = {
   buildReadingDfnTag: buildReadingDfnTag,
   buildNameDfnTag: buildNameDfnTag,
   buildEnDfnTag: buildEnDfnTag,
+  buildScript: buildScript,
   buildSpan: buildSpan,
   buildTable: buildTable,
   createCaptionTag: createCaptionTag,
@@ -85,6 +86,10 @@ function buildWriterP(id){
   var pTag = builder("p")();
   pTag.id = id;
   return pTag;
+}
+
+function buildScript(content){
+  return builder("script", content)();
 }
 
 function buildDetailsTag(detailsText, summaryText){
