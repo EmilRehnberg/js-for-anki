@@ -3,6 +3,7 @@ define(["_dom-readers"], function(readers){
     appendToBody: appendToBody,
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
+    writeTemplates: writeTemplates,
   };
 
   return writerFunctions;
@@ -27,5 +28,16 @@ define(["_dom-readers"], function(readers){
 
   function appendToBody(element){
     readers.readBody().insertAdjacentElement('beforeEnd', element);
+  }
+
+  function writeTemplates(readerId, writerId){
+    var templates = readers.readWords([readerId]);
+    for(templateNum in templates){
+      var template = templates[templateNum];
+      var templatePath = ["_tmpl-", template].join("");
+      require([templatePath], function(tags){
+        appendTags(writerId, tags);
+      });
+    }
   }
 });
