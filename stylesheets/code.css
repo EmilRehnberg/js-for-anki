@@ -1,0 +1,38 @@
+body {
+  background-color: black;
+  color: white;
+}
+
+code, samp {
+  font-family: Monaco, Courier;
+  text-align: left;
+  background-color: #222222;
+  color: oldlace; }
+
+code pre, samp pre {
+  font-family: Courier;
+  background-color: #222222;
+  margin: 0;
+  padding: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap; }
+
+samp {
+  color: grey; }
+
+pre.code-comment {
+  background-color: #222222;
+  margin: 0;
+  padding: 0px;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -o-pre-wrap;
+  color: violet;
+  background-color: #000; }
+
+pre.small {
+  font-size: 0.52em; }
+
+pre.tiny {
+  font-size: 0.28em; }
