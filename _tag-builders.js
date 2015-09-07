@@ -1,6 +1,7 @@
 
 var moduleFunctions = {
   buildAnchor: buildAnchor,
+  buildCodePair: buildCodePair,
   buildDetailsTag: buildDetailsTag,
   buildDfn: buildDfn,
   buildDefDfn: buildDefDfn,
@@ -90,6 +91,30 @@ function buildWriterP(id){
 
 function buildScript(content){
   return builder("script", content)();
+}
+
+function buildCodePair(io){
+  return [buildCodePre(io.i), buildSampPre(io.o)].filter(Boolean);
+}
+
+function buildCodePre(lines){
+  var codeTag = builder("code")();
+  return buildPre(lines, codeTag);
+}
+
+function buildSampPre(lines){
+  var sampTag = builder("samp")();
+  return buildPre(lines, sampTag);
+}
+
+function buildPre(lines, wrapperTag){
+  var preTag = builder("pre", lines.join("\n"))();
+  if(wrapperTag){
+    wrapperTag.insertAdjacentElement('beforeEnd', preTag);
+    return wrapperTag;
+  } else {
+    return preTag;
+  }
 }
 
 function buildDetailsTag(detailsText, summaryText){
