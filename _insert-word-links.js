@@ -1,5 +1,5 @@
 var outId = "word-links-writer";
-var articleId = "main";
+var articleId = "auxiliary";
 require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers"], function(builders, domReaders, domWriters, arrayHelpers){
   var wordElementsIds = domReaders.readWords(["link-reader-ids"]);
   var words = domReaders.readWords(wordElementsIds);

@@ -1,6 +1,6 @@
 require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writers, builders){
   var readerId = "text-reader";
-  var articleId = "main";
+  var articleId = "auxiliary";
 
   var kanji = readKanji(readerId);
   writeKanji(articleId, kanji);
