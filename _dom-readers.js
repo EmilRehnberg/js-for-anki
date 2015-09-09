@@ -4,6 +4,7 @@ var domReadersFunctions = {
   readClozeSpans: readClozeSpans,
   readCodedHintExpr: readCodedHintExpr,
   readFirstArticle: readFirstArticle,
+  readMain: readMain,
   readTagContents: readTagContents,
   readWords: readWords,
   readElement: readElement,
@@ -59,6 +60,14 @@ function clozedHint(){
 
 function readFirstArticle(){
   return document.getElementsByTagName("article")[0];
+}
+
+function readMain(){
+  return readTags("main")[0];
+}
+
+function readTags(name){
+  return document.getElementsByTagName(name);
 }
 
 function readElement(id){
