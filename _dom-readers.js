@@ -48,7 +48,7 @@ function readCodedHintExpr(fullTextId){
 }
 
 function readAnchorContent(){
-  var anchorList = document.getElementsByTagName('a');
+  var anchorList = readTags('a');
   if (anchorList.length != 0) {
     return anchorList[0].text;
   }
@@ -59,7 +59,7 @@ function clozedHint(){
 }
 
 function readFirstArticle(){
-  return document.getElementsByTagName("article")[0];
+  return readTags("article")[0];
 }
 
 function readMain(){
