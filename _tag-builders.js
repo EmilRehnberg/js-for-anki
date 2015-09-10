@@ -68,7 +68,8 @@ function buildJaDfnTag(word){
 }
 
 function buildNameDfnTag(name){
-  return buildDfn(name, {tagContent: "+"});
+  var content = ["«", name, "»"].join("");
+  return builder("p", content)();
 }
 
 function buildReadingDfnTag(word){
