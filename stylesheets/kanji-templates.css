@@ -1,0 +1,20 @@
+body {
+  font-size: 1.6em;
+  background-color: black;
+  color: white;
+}
+
+span.reading-no {
+  color: limegreen; }
+
+span#onyomi {
+  color: chocolate; }
+
+span#kunyomi {
+  color: dodgerblue; }
+
+del {
+  color: grey;
+  font-style: normal;
+  font-weight: normal;
+  text-decoration: none; }
