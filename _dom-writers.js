@@ -1,8 +1,9 @@
-define(["_dom-readers"], function(readers){
+define(["_dom-readers", "_array-helpers"], function(readers, arrays){
   var writerFunctions = {
     appendToBody: appendToBody,
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
+    writeDfnTags: writeDfnTags,
     writeTemplates: writeTemplates,
   };
 
@@ -28,6 +29,28 @@ define(["_dom-readers"], function(readers){
 
   function appendToBody(element){
     readers.readBody().insertAdjacentElement('beforeEnd', element);
+  }
+
+  function writeDfnTags(wordSets){
+    for(var setNum in wordSets){
+      var readerId = wordSets[setNum].readerId;
+      var writerId = wordSets[setNum].writerId;
+      var tagBuilder = wordSets[setNum].builder;
+      var seperator = wordSets[setNum].seperator;
+
+      var words = readers.readWords([readerId]);
+      if(words.length == 0){ continue; }
+
+      var wordTags = [];
+      for(var wordNum in words){
+        var word = words[wordNum];
+        var dfnTag = tagBuilder(word);
+        wordTags.push(dfnTag);
+      }
+      if(seperator){ arrays.insertSeparators(wordTags, seperator); }
+
+      appendTags(writerId, wordTags);
+    }
   }
 
   function writeTemplates(readerId, writerId){

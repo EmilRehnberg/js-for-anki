@@ -1,4 +1,4 @@
-require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers"], function(readers, writers, builders, arrays){
+require(["_dom-writers", "_tag-builders"], function(writers, builders){
   var wordSets = {
     wago: {
       readerId: "wago-reader",
@@ -58,23 +58,5 @@ require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers"], fun
     }
   };
 
-  for(var setNum in wordSets){
-    var readerId = wordSets[setNum].readerId;
-    var writerId = wordSets[setNum].writerId;
-    var tagBuilder = wordSets[setNum].builder;
-    var seperator = wordSets[setNum].seperator;
-
-    var words = readers.readWords([readerId]);
-    if(words.length == 0){ continue; }
-
-    var wordTags = [];
-    for(var wordNum in words){
-      var word = words[wordNum];
-      var dfnTag = tagBuilder(word);
-      wordTags.push(dfnTag);
-    }
-    if(seperator){ arrays.insertSeparators(wordTags, seperator); }
-
-    writers.appendTags(writerId, wordTags);
-  }
+  writers.writeDfnTags(wordSets);
 });
