@@ -1,6 +1,7 @@
 
 var moduleFunctions = {
   buildAnchor: buildAnchor,
+  buildBr: buildBr,
   buildCodePair: buildCodePair,
   buildDetailsTag: buildDetailsTag,
   buildDfn: buildDfn,
@@ -32,6 +33,7 @@ function buildDfn(entity, opt){
   dfnTag.id = entity;
   if (opt.classAttr != undefined) { dfnTag.className = opt.classAttr; }
   dfnTag.innerHTML = (opt.tagContent == undefined) ? "" : opt.tagContent;
+  if (opt.wrapperTag) { dfnTag = wrapInTag(dfnTag, opt.wrapperTag); }
   return dfnTag;
 };
 
@@ -125,4 +127,8 @@ function buildDetailsTag(detailsText, summaryText){
     detailsElement.insertAdjacentElement('afterBegin', summaryElement);
   }
   return detailsElement;
+}
+
+function buildBr(){
+  return builder("br")();
 }

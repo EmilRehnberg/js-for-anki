@@ -1,14 +1,16 @@
-require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writers, builders){
+require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers"], function(readers, writers, builders, arrays){
   var wordSets = {
     wago: {
       readerId: "wago-reader",
       writerId: "wago-writer",
-      builder: builders.buildJaDfnTag
+      builder: builders.buildJaDfnTag,
+      seperator: builders.buildBr
     },
     kango: {
       readerId: "kango-reader",
       writerId: "kango-writer",
-      builder: builders.buildJaDfnTag
+      builder: builders.buildJaDfnTag,
+      seperator: builders.buildBr
     },
     namae: {
       readerId: "namae-reader",
@@ -18,12 +20,14 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, wri
     eigoWago: {
       readerId: "wago-reader",
       writerId: "eigo-writer",
-      builder: builders.buildEnDfnTag
+      builder: builders.buildEnDfnTag,
+      seperator: builders.buildBr
     },
     eigoKango: {
       readerId: "kango-reader",
       writerId: "eigo-writer",
-      builder: builders.buildEnDfnTag
+      builder: builders.buildEnDfnTag,
+      seperator: builders.buildBr
     },
     chigai: {
       readerId: "chigai-reader",
@@ -33,7 +37,8 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, wri
     imi: {
       readerId: "imi-reader",
       writerId: "definitions-writer",
-      builder: builders.buildJaDfnTag
+      builder: builders.buildJaDfnTag,
+      seperator: builders.buildBr
     },
     yomi: {
       readerId: "yomi-reader",
@@ -48,7 +53,8 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, wri
     eigo: {
       readerId: "imi-reader",
       writerId: "eigo-writer",
-      builder: builders.buildEnDfnTag
+      builder: builders.buildEnDfnTag,
+      seperator: builders.buildBr
     }
   };
 
@@ -56,6 +62,7 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, wri
     var readerId = wordSets[setNum].readerId;
     var writerId = wordSets[setNum].writerId;
     var tagBuilder = wordSets[setNum].builder;
+    var seperator = wordSets[setNum].seperator;
 
     var words = readers.readWords([readerId]);
     if(words.length == 0){ continue; }
@@ -66,6 +73,7 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, wri
       var dfnTag = tagBuilder(word);
       wordTags.push(dfnTag);
     }
+    if(seperator){ arrays.insertSeparators(wordTags, seperator); }
 
     writers.appendTags(writerId, wordTags);
   }
