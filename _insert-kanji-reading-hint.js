@@ -57,18 +57,14 @@ require(["_tag-builders", "_dom-readers", "_dom-writers"], function(builders, re
   }
 
   function delAnd(){
-    return delWrap("と");
+    return builders.delWrap("と");
   }
 
   function delLeftPara(){
-    return delWrap("(");
+    return builders.delWrap("(");
   }
 
   function delRightPara(){
-    return delWrap(")");
-  }
-
-  function delWrap(content){
-    return ["<del>", content, "</del>"].join("");
+    return builders.delWrap(")");
   }
 });
