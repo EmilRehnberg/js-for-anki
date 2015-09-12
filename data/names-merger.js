@@ -1,22 +1,4 @@
-define(
-    [
-    "_hito-actors",
-    "_hito-budo",
-    "_hito-minamoto",
-    "_hito-rekishi",
-    "_hito-tennou",
-    "_character-akutou",
-    "_character-mgs",
-    ],
-    function(
-      actors,
-      budo,
-      minamoto,
-      rekishi,
-      tennou,
-      akutou,
-      mgs
-      ){
+define(function(){
   var mapArray = [
     appendMeta(akutou, "悪党・重犯罪捜査班", "character"),
     appendMeta(mgs, "メタルギアソリッド", "character"),
