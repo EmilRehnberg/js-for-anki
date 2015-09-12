@@ -28,7 +28,7 @@ function readIdsInnerHtml(ids, seperator){
 }
 
 function readTagContents(id){
-  var element = readElement(id);
+  var element = (id) ? readElement(id) : undefined;
   return (element) ? element.innerHTML : undefined;
 }
 

@@ -4,6 +4,7 @@ define(["_dom-readers", "_array-helpers"], function(readers, arrays){
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
     writeDfnTags: writeDfnTags,
+    writeTagsFromBuilderSets: writeTagsFromBuilderSets,
     writeTemplates: writeTemplates,
   };
 
@@ -29,6 +30,27 @@ define(["_dom-readers", "_array-helpers"], function(readers, arrays){
 
   function appendToBody(element){
     readers.readBody().insertAdjacentElement('beforeEnd', element);
+  }
+
+  function writeTagsFromBuilderSets(builderSets){
+    for(var setNum in builderSets){
+      var writerId = builderSets[setNum].writerId;
+      var readerId = builderSets[setNum].readerId;
+      var tagBuilder = builderSets[setNum].builder;
+      var tagId = builderSets[setNum].tagId;
+
+      var tag = buildContentOrPlaceHolderTag(tagBuilder, readerId, tagId);
+      appendTags(writerId, [tag]);
+    }
+  }
+
+  function buildContentOrPlaceHolderTag(tagBuilder, readerId, tagId){
+    if (tagId){
+      return tagBuilder(tagId);
+    }else{
+      var content = readers.readTagContents(readerId);
+      return tagBuilder(content);
+    }
   }
 
   function writeDfnTags(wordSets){

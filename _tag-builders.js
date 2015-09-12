@@ -10,6 +10,9 @@ var moduleFunctions = {
   buildReadingDfnTag: buildReadingDfnTag,
   buildNameDfnTag: buildNameDfnTag,
   buildEnDfnTag: buildEnDfnTag,
+  buildDelDfnTag: buildDelDfnTag,
+  buildP: buildP,
+  buildDelP: buildDelP,
   buildScript: buildScript,
   buildSpan: buildSpan,
   buildTable: buildTable,
@@ -17,6 +20,7 @@ var moduleFunctions = {
   buildTableData: buildTableData,
   buildTableHeader: buildTableHeader,
   buildWriterP: buildWriterP,
+  delWrap: delWrap,
   builder: builder
 };
 
@@ -39,6 +43,15 @@ function buildDfn(entity, opt){
 
 function buildSpan(content){
   return builder("span", content)();
+}
+
+function buildP(content){
+  return builder("p", content)();
+}
+
+function buildDelP(content){
+  var pTag = builder("p", content)();
+  return wrapInTag(pTag, "del");
 }
 
 function buildTable(){
@@ -76,6 +89,10 @@ function buildNameDfnTag(name){
 
 function buildReadingDfnTag(word){
   return buildDfn(word, {classAttr: "reading"});
+}
+
+function buildDelDfnTag(word){
+  return buildDfn(word, {classAttr: "reading", wrapperTag: "del"});
 }
 
 function buildEnDfnTag(word){
@@ -131,4 +148,14 @@ function buildDetailsTag(detailsText, summaryText){
 
 function buildBr(){
   return builder("br")();
+}
+
+function wrapInTag(tag, wrapperTagName){
+  var wrapper = builder(wrapperTagName)();
+  wrapper.insertAdjacentElement('afterBegin', tag);
+  return wrapper;
+}
+
+function delWrap(content){
+  return (content) ? ["<del>", content, "</del>"].join("") : content;
 }
