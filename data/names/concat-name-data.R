@@ -3,7 +3,7 @@
 library(tools)
 library(magrittr)
 outFile = "_entity-data.js"
-nameDataDir = "data"
+nameDataDir = "data/names"
 metaFileName = "names-data-meta.csv"
 metaPath = file.path(nameDataDir, metaFileName)
 

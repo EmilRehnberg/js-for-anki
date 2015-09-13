@@ -1,7 +1,7 @@
 require 'pathname'
 
 class EntityDataCompiler
-  BUILD_NAME_MODULE_SCRIPT_PATH = "data/concat-name-data.R"
+  BUILD_NAME_MODULE_SCRIPT_PATH = "data/names/concat-name-data.R"
 
   def self.run
     puts "compiling name data"
