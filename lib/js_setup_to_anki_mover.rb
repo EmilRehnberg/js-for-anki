@@ -7,12 +7,14 @@ class JsSetUptoAnkiMover
   REQUIRE_JS_FILE_NAME = "_require.js"
 
   def self.run
+    puts "copying JavaScript to Anki"
     copy_js_setup
   end
 
   private
 
   def self.copy_js_setup
+    puts "  copying following scripts to anki: #{updated_scripts}"
     FileUtils.cp_r(updated_scripts, OUTPUT_DIR, remove_destination: true)
   end
 
