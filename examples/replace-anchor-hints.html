@@ -4,15 +4,15 @@
 <link href="../stylesheets/cloze.css" rel="StyleSheet" type="text/css">
 </head>
 
-<header>
+<main>
   <h6>ことわざ</h6>
   <dl class="dialogue" id="text-reader">
-    <dt><dfn id="牛島辰熊">+</dfn></dt>
+    <dt>«牛島辰熊»</dt>
     <dd><span class="cloze">[<a>若し</a>]</span>生きていた</dd>
     <dd>の話だがな</dd>
   </dl>
   <p id="shisa"></p>
-</header>
+</main>
 
-<script data-main="../_replace-anchor-cloze-spans.js" src="../_require.js"></script>
-<script src="append-body-html.js"></script>
+<script data-main="../_main.js" src="../_require.js"></script>
+<script>require(["_replace-anchor-cloze-spans", "_insert-name-dfns", "append-body-html.js"]);</script>

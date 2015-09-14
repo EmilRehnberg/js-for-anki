@@ -1,37 +1,28 @@
-require(["_dom-readers", "_entity-data"], function(readers, entities){
+require(["_dom-readers", "_dom-writers", "_array-helpers"], function(readers, writers, arrays){
   var nameSepRegex = new RegExp(/[«»]/);
 
   insertNameDfn();
 
   function insertNameDfn(){
     var main = readers.readMain();
-    var newInnerHTML = replaceNamesWDfn(main.innerHTML);
+    var entities = [];
+    var newInnerHTML = replaceNamesWPlaceHolder(main.innerHTML, entities);
     main.innerHTML = newInnerHTML;
+    writers.insertNameDfnToPlaceHolders(entities.filter(arrays.onlyUnique));
   }
 
-  function replaceNamesWDfn(markup){
+  function replaceNamesWPlaceHolder(markup, entities){
     var splits = markup.split(nameSepRegex);
     if (splits.length == 1){ return markup; }
     for(var i = 1; i < splits.length; i+=2){
       var entity = splits[i];
-      splits[i] = buildDfnMarkup(entity);
+      splits[i] = buildEntityPlaceHolder(entity);
+      entities.push(entity);
     };
     return splits.join("");
   }
 
-  function buildDfnMarkup(entity){
-    var entityData = entities[entity];
-    if (entityData == undefined) { return buildMissingMarkup(entity); }
-    var ja = [entity,"〔", entityData[0],"〕", entityData[1], "〈", entityData[2],"〉"].join("");
-    var className = entityData[3];
-    var dfnMarkup = [
-      "<dfn id=\"", entity,"\", class=\"", className,"\" ja=\"", ja,"\">",
-      "»", "<\/dfn>",
-      ].join("");
-    return dfnMarkup;
-  }
-
-  function buildMissingMarkup(entity){
-    return ["++", entity, "++"].join("");
+  function buildEntityPlaceHolder(entity){
+    return ["<span class='", entity,"'></span>"].join("");
   }
 });

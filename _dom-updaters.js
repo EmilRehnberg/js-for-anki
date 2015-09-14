@@ -25,8 +25,11 @@ define(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writ
     var pHintTag = builders.buildWriterP(hintId);
 
     writers.appendTags(fullTextId, [pHintTag], "afterEnd");
-    var hintElement = builders.buildDefDfn(expr);
-    writers.appendTags(hintId, [hintElement]);
+    var wordSet = {
+      words: [expr],
+      writerId: hintId,
+    };
+    writers.writeDfnTags(wordSet);
   }
 
   function replaceClozedWLength(expr) {

@@ -19,11 +19,5 @@ del {
   font-weight: normal;
   text-decoration: none; }
 
-del > dfn:after {
-  color: DarkCyan; }
-
-del > dfn:before {
-  color: #596F2F; }
-
 p {
   margin: 0; }

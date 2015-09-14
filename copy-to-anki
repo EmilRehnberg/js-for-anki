@@ -1,9 +1,9 @@
 #!/usr/bin/env ruby
 
 require './lib/js_setup_to_anki_mover'
-require './lib/entity_data_compiler'
+require './lib/data_compiler'
 
 if $0 == __FILE__ then
-  EntityDataCompiler.run
+  DataCompiler.run
   JsSetUptoAnkiMover.run
 end

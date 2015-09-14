@@ -1,8 +1,10 @@
-define(["_dom-readers", "_array-helpers"], function(readers, arrays){
+define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, arrays, builders){
   var writerFunctions = {
     appendToBody: appendToBody,
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
+    insertNameDfnToPlaceHolders: insertNameDfnToPlaceHolders,
+    readWordsWriteDfnTags: readWordsWriteDfnTags,
     writeDfnTags: writeDfnTags,
     writeTagsFromBuilderSets: writeTagsFromBuilderSets,
     writeTemplates: writeTemplates,
@@ -53,26 +55,41 @@ define(["_dom-readers", "_array-helpers"], function(readers, arrays){
     }
   }
 
-  function writeDfnTags(wordSets){
+  function readWordsWriteDfnTags(wordSets){
     for(var setNum in wordSets){
-      var readerId = wordSets[setNum].readerId;
-      var writerId = wordSets[setNum].writerId;
-      var tagBuilder = wordSets[setNum].builder;
-      var seperator = wordSets[setNum].seperator;
-
-      var words = readers.readWords([readerId]);
-      if(words.length == 0){ continue; }
-
-      var wordTags = [];
-      for(var wordNum in words){
-        var word = words[wordNum];
-        var dfnTag = tagBuilder(word);
-        wordTags.push(dfnTag);
-      }
-      if(seperator){ arrays.insertSeparators(wordTags, seperator); }
-
-      appendTags(writerId, wordTags);
+      var wordSet = wordSets[setNum];
+      wordSet.words = readWords(wordSet);
+      if(wordSet.words.length == 0){ continue; }
+      writeDfnTags(wordSet);
     }
+  }
+
+  function writeDfnTags(wordSet){
+    var writerId = wordSet.writerId;
+    var wordTags = buildWordTags(wordSet);
+    appendTags(writerId, wordTags);
+  }
+
+  function buildWordTags(wordSet){
+    var words = wordSet.words;
+    var wordTags = [];
+    for(var wordNum in words){
+      var word = words[wordNum];
+      var dfnTag = builders.buildWordDfnTag(word);
+      wordTags.push(dfnTag);
+    }
+    insertSeparators(wordSet, wordTags);
+    return wordTags;
+  }
+
+  function insertSeparators(wordSet, wordTags){
+    var seperator = wordSet.seperator;
+    if(seperator){ arrays.insertSeparators(wordTags, seperator); }
+  }
+
+  function readWords(wordSet){
+    var readerId = wordSet.readerId;
+    return readers.readWords([readerId]);
   }
 
   function writeTemplates(readerId, writerId){
@@ -83,6 +100,18 @@ define(["_dom-readers", "_array-helpers"], function(readers, arrays){
       require([templatePath], function(tags){
         appendTags(writerId, tags);
       });
+    }
+  }
+
+  function insertNameDfnToPlaceHolders(names){
+    for(nameNum in names){
+      var name = names[nameNum];
+      var placeHolders = document.getElementsByClassName(name);
+      for (var holderNum = 0; holderNum < placeHolders.length; holderNum++) {
+        var placeHolder = placeHolders[holderNum];
+        var dfnTag = builders.buildNameDfnTag(name);
+        placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
+      }
     }
   }
 });

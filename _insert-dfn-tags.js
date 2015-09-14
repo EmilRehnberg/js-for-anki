@@ -3,26 +3,23 @@ require(["_dom-writers", "_tag-builders"], function(writers, builders){
     imi: {
       readerId: "imi-reader",
       writerId: "definitions-writer",
-      builder: builders.buildJaDfnTag,
-      seperator: builders.buildBr
+      seperator: builders.buildBr,
     },
     yomi: {
       readerId: "yomi-reader",
-      writerId: "definitions-writer",
-      builder: builders.buildReadingDfnTag
+      writerId: "reading-writer",
     },
     namae: {
       readerId: "namae-reader",
-      writerId: "definitions-writer",
-      builder: builders.buildNameDfnTag
+      writerId: "namae-writer",
     },
     eigo: {
       readerId: "imi-reader",
       writerId: "eigo-writer",
-      builder: builders.buildEnDfnTag,
-      seperator: builders.buildBr
+      seperator: builders.buildBr,
     }
   };
 
-  writers.writeDfnTags(wordSets);
+  writers.readWordsWriteDfnTags(wordSets);
+
 });

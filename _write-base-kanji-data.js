@@ -1,5 +1,5 @@
-require(["_dom-readers", "_dom-writers", "_tag-builders"], function(reader, writers, builders){
-  var jaWriterId = "ja-writer";
+require(["_dom-writers", "_tag-builders"], function(writers, builders){
+  var jaWriterId = "definitions-writer";
   var namaeWriterId = "namae-writer";
   var eigoWriterId = "eigo-writer";
   var chigaiWriterId = "chigai-writer";
@@ -60,38 +60,32 @@ require(["_dom-readers", "_dom-writers", "_tag-builders"], function(reader, writ
     wago: {
       readerId: "wago-reader",
       writerId: jaWriterId,
-      builder: builders.buildJaDfnTag,
       seperator: builders.buildBr
     },
     kango: {
       readerId: "kango-reader",
       writerId: jaWriterId,
-      builder: builders.buildJaDfnTag,
       seperator: builders.buildBr
     },
     namae: {
       readerId: "namae-reader",
       writerId: namaeWriterId,
-      builder: builders.buildNameDfnTag
     },
     eigoWago: {
       readerId: "wago-reader",
       writerId: eigoWriterId,
-      builder: builders.buildEnDfnTag,
       seperator: builders.buildBr
     },
     eigoKango: {
       readerId: "kango-reader",
       writerId: eigoWriterId,
-      builder: builders.buildEnDfnTag,
       seperator: builders.buildBr
     },
     chigai: {
       readerId: "chigai-reader",
       writerId: chigaiWriterId,
-      builder: builders.buildDelDfnTag,
     },
   };
   writers.writeTagsFromBuilderSets(simpleContent);
-  writers.writeDfnTags(wordSets);
+  writers.readWordsWriteDfnTags(wordSets);
 });
