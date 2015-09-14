@@ -1,5 +1,6 @@
 var helperFunctions = {
-  insertSeparators: insertSeparators
+  insertSeparators: insertSeparators,
+  onlyUnique: onlyUnique,
 };
 
 define(function(helpers){ return helperFunctions; });
@@ -9,4 +10,8 @@ function insertSeparators(elements, sepClosure){
     elements.splice(i+1, 0, sepClosure());
   }
   return elements;
+}
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
 }
