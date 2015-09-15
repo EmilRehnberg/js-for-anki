@@ -18,6 +18,7 @@ readWordsTsv <- function(path){
   read.csv(path,
            col.names=c("word", "reading", "definition", "translation"),
            header=FALSE,
+           na.strings = c("NA", "null"),
            sep="\t",
            stringsAsFactors=FALSE
            )
