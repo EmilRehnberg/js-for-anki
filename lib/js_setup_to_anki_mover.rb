@@ -3,7 +3,7 @@ require 'fileutils'
 
 class JsSetUptoAnkiMover
   OUTPUT_DIR = Pathname.new("~/Documents/Anki/e/collection.media/.").expand_path
-  JS_FILE_REGEX = Regexp.new(/\_[\w-]+\.js/)
+  JS_FILE_REGEX = Regexp.new(/\A\_[\w-]+\.js/)
   REQUIRE_JS_FILE_NAME = "_require.js"
 
   def self.run
