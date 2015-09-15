@@ -74,6 +74,8 @@ for(word in repWords){
 }
 
 wordDt$ja = ""
+wordDt <- wordDt %>%
+  extract(wordDt %>% extract("reading") %>% order,)
 
 write.table(wordDt[, wordColumns],
             file=outWordsTsvPath,
