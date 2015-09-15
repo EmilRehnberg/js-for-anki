@@ -1,3 +1,5 @@
+data/kanji/baseData.tsv
+data/words/wordsFromSharkKanji.tsv
 _entity-data.js
 _words-data.js
 *~
