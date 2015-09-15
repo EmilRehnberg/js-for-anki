@@ -4,7 +4,7 @@ require(magrittr)
 
 originalTsvPath = "./nhg-shark-kanji.txt"
 outKanjiTsvPath = "./kanji/baseData.tsv"
-outWordsTsvPath = "./words/wordsFromSharkKanji.tsv"
+outWordsTsvPath = "./wordsFromSharkKanji.tsv"
 
 columnNames <-
   c("heisigNr", "V2", "V3",
