@@ -1,4 +1,4 @@
-define(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writers, builders){
+define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], function(readers, writers, builders, strings){
   var domUpdaterFunctions = {
     insertHint: insertHint,
     replaceClozeExpr: replaceClozeExpr,
@@ -44,14 +44,6 @@ define(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writ
   }
 
   function dottifyExpression(expression){
-    return dottifyTxt(removeNumbers(expression));
-  }
-
-  function removeNumbers(expression){
-    return expression.replace(/[\d]/g, "");
-  }
-
-  function dottifyTxt(expression){
-    return expression.replace(/./g, "・");
+    return strings.dottifyTxt(strings.removeNumbers(expression));
   }
 });
