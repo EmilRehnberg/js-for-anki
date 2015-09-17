@@ -1,5 +1,6 @@
 var domReadersFunctions = {
   readAnchorContent: readAnchorContent,
+  readBangHint: readBangHint,
   readBody: readBody,
   readClozeSpans: readClozeSpans,
   readCodedHintExpr: readCodedHintExpr,
@@ -52,6 +53,34 @@ function readAnchorContent(){
   if (anchorList.length != 0) {
     return anchorList[0].text;
   }
+}
+
+function readBangHint(){
+  var spans = readClozeSpans();
+  var bangHints = readBangHintsFromSpans(spans);
+  if (bangHints.length != 0) {
+    return bangHints[0];
+  }
+}
+
+function readBangHintsFromSpans(spans){
+  var bangHints = [];
+  for(spanNum in spans){
+    var content = spans[spanNum].innerHTML;
+    if(content == undefined){ continue; }
+    if(hasClozedBangHint(content)){
+      bangHints.push(readClozedBangHint(content));
+    }
+  }
+  return bangHints;
+}
+
+function hasClozedBangHint(content){
+  return content[1] == "!";
+}
+
+function readClozedBangHint(content){
+  return content.slice(2,-1);
 }
 
 function clozedHint(){
