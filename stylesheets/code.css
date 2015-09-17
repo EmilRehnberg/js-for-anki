@@ -22,6 +22,7 @@ samp {
   color: grey; }
 
 pre.code-comment {
+  font-family: Courier;
   background-color: #222222;
   margin: 0;
   padding: 0px;

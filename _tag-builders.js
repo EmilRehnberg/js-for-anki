@@ -15,6 +15,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     buildTableHeader: buildTableHeader,
     buildWriterP: buildWriterP,
     delWrap: delWrap,
+    stackBuilder: stackBuilder,
     builder: builder
   };
   return moduleFunctions;
@@ -113,6 +114,14 @@ define(["_words-data", "_entity-data"], function(words, names){
     var wrapper = builder(wrapperTagName)();
     wrapper.insertAdjacentElement('afterBegin', tag);
     return wrapper;
+  }
+
+  function stackBuilder(tags){
+    var divTag = builder("div")();
+    for(tagNum in tags){
+      divTag.insertAdjacentElement('beforeEnd', tags[tagNum]);
+    }
+    return divTag;
   }
 
   function delWrap(content){

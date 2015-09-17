@@ -1,10 +1,33 @@
-define(["_tag-builders"], function(tags){
+define(["_tag-builders", "_dom-writers"], function(tags, writers){
   return {
-    buildCodePair: buildCodePair,
+    buildCodeTagsSet: buildCodeTagsSet,
+    writeAdjacentCode: writeAdjacentCode,
   };
 
-  function buildCodePair(io){
-    return [buildCodePre(io.i), buildSampPre(io.o)].filter(Boolean);
+  function writeAdjacentCode(ioSets){
+    var preTags = buildCodeTagsSet(ioSets);
+    var tagStack = tags.stackBuilder(preTags);
+    writers.appendToFirstArticle(tagStack);
+  }
+
+  function buildCodeTagsSet(ioSets){
+    var lines = [];
+    for(var setNum in ioSets){
+      var set = ioSets[setNum];
+      lines.push(
+        buildCommentPre(set.c),
+        buildCodePre(set.i),
+        buildSampPre(set.o)
+      );
+    }
+    return lines.filter(Boolean);
+  }
+
+  function buildCommentPre(lines){
+    if(lines == undefined){ return; }
+    var commentTag = buildPre(lines);
+    commentTag.className = "code-comment";
+    return commentTag;
   }
 
   function buildCodePre(lines){
