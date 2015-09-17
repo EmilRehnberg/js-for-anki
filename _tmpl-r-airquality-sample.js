@@ -1,4 +1,4 @@
-define(["_tag-builders"], function(builders){
+define(["_code-builders"], function(codes){
   var io = {
     i: [
       "airquality",
@@ -14,5 +14,5 @@ define(["_tag-builders"], function(builders){
     ]
   };
 
-  return builders.buildCodePair(io);
+  return codes.buildCodePair(io);
 });
