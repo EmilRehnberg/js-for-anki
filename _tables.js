@@ -1,7 +1,7 @@
 define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
-  return { writeTable: writeTable };
+  return { writeAdjacentTable: writeAdjacentTable };
 
-  function writeTable(data){
+  function writeAdjacentTable(data){
     var table = buildDataTable(data);
     writers.appendToFirstArticle(table);
   }

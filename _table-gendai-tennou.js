@@ -11,5 +11,5 @@ require(["_tables"], function(tables){
   }
 };
 
-tables.writeTable(data);
+tables.writeAdjacentTable(data);
 });
