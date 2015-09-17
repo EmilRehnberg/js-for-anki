@@ -1,6 +1,6 @@
 var outId = "word-links-writer";
 var articleId = "auxiliary";
-require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers"], function(builders, domReaders, domWriters, arrayHelpers){
+require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers", "_string-helpers"], function(builders, domReaders, domWriters, arrayHelpers, strings){
   var wordElementsIds = domReaders.readWords(["link-reader-ids"]);
   var words = domReaders.readWords(wordElementsIds);
   if (words.length == 0) { return; }
@@ -22,8 +22,8 @@ require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers"], fun
     return tags;
   }
 
-  function wordDictUrl(word){
-    return ["http://dictionary.goo.ne.jp/srch/all", word, "m0u/"].join("/");
+  function wordDictUrl(expression){
+    var parsedExpression = strings.removeNumbers(expression);
+    return ["http://dictionary.goo.ne.jp/srch/all", parsedExpression, "m0u/"].join("/");
   }
-
 });
