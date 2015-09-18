@@ -9,7 +9,7 @@ function adjustAbbr(abbr){
     var letters = abbr.id;
   } else {
     var letters = abbr.innerHTML;
-    abbr.innerHTML = "»";
+    abbr.innerHTML = "※";
   }
   abbr.id = letters.toLowerCase();
 }
