@@ -3,6 +3,7 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
     insertHint: insertHint,
     replaceClozeExpr: replaceClozeExpr,
     replaceWithLength: replaceWithLength,
+    replaceRomanWord: replaceRomanWord,
   };
 
   return domUpdaterFunctions;
@@ -45,5 +46,10 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
 
   function dottifyExpression(expression){
     return strings.dottifyTxt(strings.removeNumbers(expression));
+  }
+
+  function replaceRomanWord(word, element){
+    var wordRegex = new RegExp(word, "gi");
+    element.innerHTML = element.innerHTML.replace(wordRegex, "<span class='cloze'>＊</span>")
   }
 });
