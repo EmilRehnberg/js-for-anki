@@ -3,46 +3,47 @@ require(["_dom-writers", "_tag-builders"], function(writers, builders){
   var namaeWriterId = "namae-writer";
   var eigoWriterId = "eigo-writer";
   var chigaiWriterId = "chigai-writer";
+  var baseWriterId = "base-data-writer";
 
   var simpleContent = {
     radical: {
       readerId: "radical-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildP,
     },
     ja: {
       tagId: jaWriterId,
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildWriterP,
     },
     jaOldWago: {
       readerId: "old-wago-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildP,
     },
     jaOldKango: {
       readerId: "old-kango-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildP,
     },
     namae: {
       tagId: namaeWriterId,
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildWriterP,
     },
     chigai: {
       tagId: chigaiWriterId,
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildWriterP,
     },
     chigaiOld: {
       readerId: "old-chigai-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildDelP,
     },
     story: {
       readerId: "story-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildP,
     },
     eigo: {
@@ -52,7 +53,7 @@ require(["_dom-writers", "_tag-builders"], function(writers, builders){
     },
     audio: {
       readerId: "audio-reader",
-      writerId: "base-data-writer",
+      writerId: baseWriterId,
       builder: builders.buildP,
     },
   };
