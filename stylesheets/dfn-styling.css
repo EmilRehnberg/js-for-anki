@@ -34,23 +34,23 @@ dfn:before {
 #chigai-writer > dfn:before {
   color: #596F2F; }
 
-#hint > dfn:before {
+#hint dfn:before {
   content: ""; }
 
-#hint > dfn:after {
+#hint dfn:after {
   content: attr(ja);
   color: LawnGreen; }
 
-#definitions-writer > dfn:after, #namae-writer > dfn:after {
+#definitions-writer dfn:after, #namae-writer dfn:after {
   content: "〔" attr(reading) "〕" attr(ja); }
 
-#reading-writer > dfn:after {
+#reading-writer dfn:after {
   content: "〔" attr(reading) "〕"; }
-#reading-writer > dfn:after {
+#reading-writer dfn:after {
   content: "〔" attr(reading) "〕"; }
 
-#eigo-writer > dfn:after {
-  content: "：" attr(en); }
+#eigo-writer dfn:after {
+  content: ": " attr(en); }
 
-#reading-writer > dfn:after, #chigai-writer > dfn:after {
+#reading-writer dfn:after, #chigai-writer dfn:after {
   content: "〔" attr(reading) "〕"; }

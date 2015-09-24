@@ -1,5 +1,6 @@
 define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, arrays, builders){
   var writerFunctions = {
+    appendTextToElement: appendTextToElement,
     appendToBody: appendToBody,
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
@@ -67,7 +68,8 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
   function writeDfnTags(wordSet){
     var writerId = wordSet.writerId;
     var wordTags = buildWordTags(wordSet);
-    appendTags(writerId, wordTags);
+    var tagStack = builders.stackBuilder(wordTags);
+    appendTags(writerId, [tagStack]);
   }
 
   function buildWordTags(wordSet){
@@ -113,5 +115,9 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
         placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
       }
     }
+  }
+
+  function appendTextToElement(id, text){
+    readers.readElement(id).insertAdjacentText("beforeEnd", text);
   }
 });

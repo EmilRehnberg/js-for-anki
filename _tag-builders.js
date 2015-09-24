@@ -13,8 +13,10 @@ define(["_words-data", "_entity-data"], function(words, names){
     createCaptionTag: createCaptionTag,
     buildTableData: buildTableData,
     buildTableHeader: buildTableHeader,
+    buildReaderP: buildReaderP,
     buildWriterP: buildWriterP,
     delWrap: delWrap,
+    spaceSpanBuilder: spaceSpanBuilder,
     stackBuilder: stackBuilder,
     builder: builder
   };
@@ -93,6 +95,12 @@ define(["_words-data", "_entity-data"], function(words, names){
     return pTag;
   }
 
+  function buildReaderP(id){
+    var pTag = buildWriterP(id);
+    pTag.setAttribute("hidden", true);
+    return pTag;
+  }
+
   function buildScript(content){
     return builder("script", content)();
   }
@@ -122,6 +130,10 @@ define(["_words-data", "_entity-data"], function(words, names){
       divTag.insertAdjacentElement('beforeEnd', tags[tagNum]);
     }
     return divTag;
+  }
+
+  function spaceSpanBuilder(){
+    return builder("span", " ")();
   }
 
   function delWrap(content){

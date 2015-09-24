@@ -1,0 +1,37 @@
+<head>
+<meta charset="UTF-8">
+<link href="../stylesheets/dfn-styling.css" rel="StyleSheet" type="text/css">
+<link href="../stylesheets/kanji-templates.css" rel="StyleSheet" type="text/css">
+</head>
+
+<section>
+  <header>
+    <p id="kanji-data-writer">追</p>
+  </header>
+
+  <article id="base-data-writer"> </article>
+  <article id="bottom">
+    <details id="aux-data-writer">
+      <summary>詳細</summary>
+    </details>
+  </article>
+
+  <p hidden id="wago-reader">追っ手</p>
+  <p hidden id="old-wago-reader">追う＝おう, to follow, chase</p>
+  <p hidden id="wago-number-reader">弐</p>
+
+  <p hidden id="kango-reader">追従</p>
+  <p hidden id="old-kango-reader">追跡＝ついせき, tracking, chase, pursuit</p>
+  <p hidden id="kango-number-reader"></p>
+
+  <p hidden id="chigai-reader">恋愛,養う2</p>
+  <p hidden id="old-chigai-reader">泉＝いずみ</p>
+
+  <p hidden id="usage-reader">［学習漢字］1年</p>
+  <p hidden id="radical-reader">cocoon ... little</p>
+  <p hidden id="story-reader">Out of the <u>cocoon</u>, there comes little <i>tiny</i> bit of <i>thread</i>.</p>
+  <p hidden id="audio-reader">[sound:糸.mp3]</p>
+</section>
+
+<script data-main="../_main.js" src="../_require.js"></script>
+<script> require(["_write-base-kanji-data", "append-body-html.js"], function(m){ m.main() }); </script>
