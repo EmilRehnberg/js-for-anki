@@ -1,14 +1,15 @@
 require(["_dom-readers", "_dom-writers", "_tag-builders"], function(readers, writers, builders){
   var execScripts = readers.readWords(["execute-scripts"]);
-  for (scriptNum in execScripts){
-    var scriptTag = buildScript(execScripts[scriptNum]);
-    writers.appendToBody(scriptTag);
-  }
+  execScripts.forEach(printScriptTag);
 
   function buildScript(scriptName){
     var prependPath = readPrependedPath();
     var code = ['require(["', prependPath, '_', scriptName, '.js"]);'].join("");
     return builders.buildScript(code);
+  }
+
+  function printScriptTag(scriptName){
+    writers.appendToBody(buildScript(scriptName));
   }
 
   // only used in examples
