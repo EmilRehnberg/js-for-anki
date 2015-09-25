@@ -20,12 +20,7 @@ function readWords(ids){
 }
 
 function readIdsInnerHtml(ids, seperator){
-  var contents = [];
-  for (var idNum in ids){
-    var id = ids[idNum];
-    contents = contents.concat(readTagContents(id));
-  };
-  return contents.join(seperator);
+  return ids.map(readTagContents).join(seperator);
 }
 
 function readTagContents(id){
@@ -64,15 +59,15 @@ function readBangHint(){
 }
 
 function readBangHintsFromSpans(spans){
-  var bangHints = [];
-  for(spanNum in spans){
-    var content = spans[spanNum].innerHTML;
-    if(content == undefined){ continue; }
-    if(hasClozedBangHint(content)){
-      bangHints.push(readClozedBangHint(content));
-    }
+  return [].map.call(spans, readBangHintFromSpan).filter(Boolean);
+}
+
+function readBangHintFromSpan(span){
+  var content = span.innerHTML;
+  if(content == undefined){ return; }
+  if(hasClozedBangHint(content)){
+    return readClozedBangHint(content);
   }
-  return bangHints;
 }
 
 function hasClozedBangHint(content){
