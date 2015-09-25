@@ -1,4 +1,5 @@
 var helperFunctions = {
+  concat: concat,
   findMatches: findMatches,
   insertSeparators: insertSeparators,
   onlyUnique: onlyUnique,
@@ -27,4 +28,8 @@ function removeElements(array1, array2){
   array2.forEach(function(element){
     array1.splice(array1.indexOf(element), 1)
   });
+}
+
+function concat(array, additionalElementsArray){
+  return array.concat(additionalElementsArray);
 }

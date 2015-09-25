@@ -1,4 +1,4 @@
-define(["_tag-builders", "_dom-writers"], function(tags, writers){
+define(["_tag-builders", "_dom-writers", "_array-helpers"], function(tags, writers, arrays){
   return {
     buildCodeTagsSet: buildCodeTagsSet,
     writeAdjacentCode: writeAdjacentCode,
@@ -11,16 +11,18 @@ define(["_tag-builders", "_dom-writers"], function(tags, writers){
   }
 
   function buildCodeTagsSet(ioSets){
-    var lines = [];
-    for(var setNum in ioSets){
-      var set = ioSets[setNum];
-      lines.push(
+    return ioSets.
+      map(setToLineTags).
+      reduce(arrays.concat).
+      filter(Boolean);
+  }
+
+  function setToLineTags(set){
+    return [
         buildCommentPre(set.c),
         buildCodePre(set.i),
-        buildSampPre(set.o)
-      );
-    }
-    return lines.filter(Boolean);
+        buildSampPre(set.o),
+        ];
   }
 
   function buildCommentPre(lines){
