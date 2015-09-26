@@ -14,12 +14,11 @@ require(["_tag-builders", "_dom-readers", "_dom-writers", "_array-helpers", "_st
   domWriters.appendTags(outId, tags);
 
   function mkWordATags(words){
-    var tags = [];
-    for (var wordNum in words) {
-      var word = words[wordNum];
-      tags = tags.concat(builders.buildAnchor(word, wordDictUrl(word)));
-    };
-    return tags;
+    return words.map(buildAnchor);
+  }
+
+  function buildAnchor(word){
+    return builders.buildAnchor(word, wordDictUrl(word));
   }
 
   function wordDictUrl(expression){
