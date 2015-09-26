@@ -35,14 +35,13 @@ define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
   }
 
   function insertTableData(table, tableData){
-    var keys = Object.keys(tableData);
-    for (var rowName in tableData) {
+    Object.keys(tableData).forEach(function(rowName){
       var row = table.insertRow(-1);
       var th = tagBuilders.buildTableHeader(rowName);
       row.appendChild(th);
       var rowData = tableData[rowName];
       fillOutTableRow(row, rowData, tagBuilders.buildTableData);
-    };
+    });
   }
 
   function fillOutTableRow(row, data, builder){
