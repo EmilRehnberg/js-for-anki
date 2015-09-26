@@ -36,6 +36,10 @@ define(["_words-data", "_entity-data"], function(words, names){
     return builder("p", content)();
   }
 
+  function buildDiv(){
+    return builder("div")();
+  }
+
   function buildDelP(content){
     var pTag = builder("p", content)();
     return wrapInTag(pTag, "del");
@@ -119,17 +123,13 @@ define(["_words-data", "_entity-data"], function(words, names){
   }
 
   function wrapInTag(tag, wrapperTagName){
-    var wrapper = builder(wrapperTagName)();
-    wrapper.insertAdjacentElement('afterBegin', tag);
-    return wrapper;
+    return insertElement(builder(wrapperTagName)(), tag);
   }
 
   function stackBuilder(tags){
-    var divTag = builder("div")();
-    for(tagNum in tags){
-      divTag.insertAdjacentElement('beforeEnd', tags[tagNum]);
-    }
-    return divTag;
+    return tags.reduce(function(divTag, tag){
+      return insertElement(divTag, tag);
+    }, buildDiv());
   }
 
   function spaceSpanBuilder(){
@@ -138,6 +138,11 @@ define(["_words-data", "_entity-data"], function(words, names){
 
   function delWrap(content){
     return (content) ? ["<del>", content, "</del>"].join("") : content;
+  }
+
+  function insertElement(element, adjacentElement){
+    element.insertAdjacentElement("beforeEnd", adjacentElement);
+    return element;
   }
 });
 
