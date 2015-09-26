@@ -1,8 +1,5 @@
 var abbrs = document.getElementsByTagName("abbr");
-for (var abbrNum in abbrs){
-  var abbr = abbrs[abbrNum];
-  abbr = adjustAbbr(abbr);
-}
+[].forEach.call(abbrs, adjustAbbr);
 
 function adjustAbbr(abbr){
   if (abbr.id) {
