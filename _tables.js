@@ -1,5 +1,8 @@
 define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
-  return { writeAdjacentTable: writeAdjacentTable };
+  return {
+    writeAdjacentTable: writeAdjacentTable,
+    wrapMapContentsInCodeTag: wrapMapContentsInCodeTag
+  };
 
   function writeAdjacentTable(data){
     var table = buildDataTable(data);
@@ -50,5 +53,16 @@ define(["_tag-builders", "_dom-writers"], function(tagBuilders, writers){
       var cell = builder(cellData);
       row.appendChild(cell);
     }
+  }
+
+  function wrapMapContentsInCodeTag(dataMap){
+    return Object.keys(dataMap).reduce(function(funcMap, func){
+      funcMap[func] = dataMap[func].map(wrapInCodeTag);
+      return funcMap;
+    }, {});
+  }
+
+  function wrapInCodeTag(code){
+    return ["<code>", code, "</code>"].join("");
   }
 });
