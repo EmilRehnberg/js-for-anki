@@ -22,14 +22,13 @@ require(["_tables"], function(tables){
     }
   };
 
-  for (language in adjacentCodeExamples) {
-    for (codeExampleNum in adjacentCodeExamples[language]) {
-      var example = adjacentCodeExamples[language][codeExampleNum];
+  Object.keys(adjacentCodeExamples).forEach(function(language){
+    adjacentCodeExamples[language].forEach(function(example, codeExampleNum){
       var exampleTagString = ["<code>", example, "</code>"].join("");
       var structName = data["tableData"][language][codeExampleNum];
       data["tableData"][language][codeExampleNum] = [structName, exampleTagString].filter(Boolean).join(": ");
-    }
-  };
+    });
+  });
 
   tables.writeAdjacentTable(data);
 });
