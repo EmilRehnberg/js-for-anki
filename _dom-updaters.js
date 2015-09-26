@@ -34,10 +34,10 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
   }
 
   function replaceClozedWLength(expr) {
-    var clozeSpans = readers.readClozeSpans();
-    for (clozeNum in clozeSpans){
-      replaceWithLength(clozeSpans[clozeNum], expr);
-    }
+    [].forEach.call(
+        readers.readClozeSpans(),
+        function(span){ replaceWithLength(span, expr); }
+        );
   }
 
   function replaceWithLength(element, expression){
