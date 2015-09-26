@@ -2,6 +2,7 @@ var domReadersFunctions = {
   readAnchorContent: readAnchorContent,
   readBangHint: readBangHint,
   readBody: readBody,
+  readClassNameElements: readClassNameElements,
   readClozeSpans: readClozeSpans,
   readCodedHintExpr: readCodedHintExpr,
   readFirstArticle: readFirstArticle,
@@ -29,7 +30,11 @@ function readTagContents(id){
 }
 
 function readClozeSpans(){
-  return document.getElementsByClassName("cloze");
+  return readClassNameElements("cloze");
+}
+
+function readClassNameElements(className){
+  return document.getElementsByClassName(className);
 }
 
 function readCodedHintExpr(fullTextId){

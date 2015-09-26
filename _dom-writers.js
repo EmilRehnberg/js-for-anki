@@ -1,4 +1,4 @@
-define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, arrays, builders){
+define(["_dom-readers", "_array-helpers", "_object-helpers", "_tag-builders"], function(readers, arrays, objects, builders){
   var writerFunctions = {
     appendTextToElement: appendTextToElement,
     appendToBody: appendToBody,
@@ -16,14 +16,14 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
   function appendTags(id, tags, position){
     var element = readers.readElement(id);
     if(element == undefined){ return; }
-    for (var tagNum in tags) {
-      appendTagToElement(element, tags[tagNum], position);
-    }
+    tags.forEach(appendTagToElementBuilder(element, position));
   }
 
-  function appendTagToElement(element, tag, position){
-    var relPosition = (position) ? position : "beforeEnd";
-    element.insertAdjacentElement(relPosition, tag);
+  function appendTagToElementBuilder(element, position){
+    return function(tag){
+      var relPosition = (position) ? position : "beforeEnd";
+      element.insertAdjacentElement(relPosition, tag);
+    };
   }
 
   function appendToFirstArticle(element){
@@ -36,15 +36,12 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
   }
 
   function writeTagsFromBuilderSets(builderSets){
-    for(var setNum in builderSets){
-      var writerId = builderSets[setNum].writerId;
-      var readerId = builderSets[setNum].readerId;
-      var tagBuilder = builderSets[setNum].builder;
-      var tagId = builderSets[setNum].tagId;
+    objects.forEach(builderSets, writeTagFromBuilderSet);
+  }
 
-      var tag = buildContentOrPlaceHolderTag(tagBuilder, readerId, tagId);
-      appendTags(writerId, [tag]);
-    }
+  function writeTagFromBuilderSet(set){
+    var tag = buildContentOrPlaceHolderTag(set.builder, set.readerId, set.tagId);
+    appendTags(set.writerId, [tag]);
   }
 
   function buildContentOrPlaceHolderTag(tagBuilder, readerId, tagId){
@@ -57,12 +54,13 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
   }
 
   function readWordsWriteDfnTags(wordSets){
-    for(var setNum in wordSets){
-      var wordSet = wordSets[setNum];
-      wordSet.words = readWords(wordSet);
-      if(wordSet.words.length == 0){ continue; }
-      writeDfnTags(wordSet);
-    }
+    objects.forEach(wordSets, readWriteFromSet);
+  }
+
+  function readWriteFromSet(set){
+    set.words = readWords(set);
+    if(set.words.length == 0){ return; }
+    writeDfnTags(set);
   }
 
   function writeDfnTags(wordSet){
@@ -73,13 +71,7 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
   }
 
   function buildWordTags(wordSet){
-    var words = wordSet.words;
-    var wordTags = [];
-    for(var wordNum in words){
-      var word = words[wordNum];
-      var dfnTag = builders.buildWordDfnTag(word);
-      wordTags.push(dfnTag);
-    }
+    var wordTags = wordSet.words.map(builders.buildWordDfnTag);
     insertSeparators(wordSet, wordTags);
     return wordTags;
   }
@@ -96,24 +88,31 @@ define(["_dom-readers", "_array-helpers", "_tag-builders"], function(readers, ar
 
   function writeTemplates(readerId, writerId){
     var templates = readers.readWords([readerId]);
-    for(templateNum in templates){
-      var template = templates[templateNum];
+    templates.forEach(writeTemplateTags(writerId));
+  }
+
+  function writeTemplateTags(writerId){
+    return function(template){
       var templatePath = ["_tmpl-", template].join("");
       require([templatePath], function(tags){
         appendTags(writerId, tags);
       });
-    }
+    };
   }
 
   function insertNameDfnToPlaceHolders(names){
-    for(nameNum in names){
-      var name = names[nameNum];
-      var placeHolders = document.getElementsByClassName(name);
-      for (var holderNum = 0; holderNum < placeHolders.length; holderNum++) {
-        var placeHolder = placeHolders[holderNum];
-        var dfnTag = builders.buildNameDfnTag(name);
-        placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
-      }
+    names.forEach(findNameClassesAndInsertDfnTags);
+  }
+
+  function findNameClassesAndInsertDfnTags(name){
+    var placeHolders = readers.readClassNameElements(name);
+    [].forEach.call(placeHolders, insertNameDfnToPlaceHolder(name));
+  }
+
+  function insertNameDfnToPlaceHolder(name){
+    return function(placeHolder){
+      var dfnTag = builders.buildNameDfnTag(name);
+      placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
     }
   }
 
