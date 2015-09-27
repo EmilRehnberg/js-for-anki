@@ -1,4 +1,5 @@
 require(["_tag-builders", "_dom-readers", "_dom-writers"], function(builders, readers, writers){
+  var kanjiReaderId = "kanji-reader";
   var wagoReaderId = "wago-reader";
   var kangoReaderId = "kango-reader";
   var chigaiReaderId = "chigai-reader";
@@ -20,7 +21,7 @@ require(["_tag-builders", "_dom-readers", "_dom-writers"], function(builders, re
   }
 
   function buildHint(readingSymbol, numId, isPresent){
-    var hintNum = readers.readTagContents(numId);
+    var hintNum = readContents(numId);
     if(hintNum){ return readNumSpan(hintNum) + readingSymbol; }
     return (isPresent) ? readingSymbol : "";
   }
@@ -51,8 +52,8 @@ require(["_tag-builders", "_dom-readers", "_dom-writers"], function(builders, re
   }
 
   function readingIsAvailable(readerId, oldReaderId){
-    var reading = readers.readTagContents(readerId);
-    var oldReading = readers.readTagContents(oldReaderId);
+    var reading = readContents(readerId);
+    var oldReading = readContents(oldReaderId);
     return [reading, oldReading].filter(Boolean).length > 0;
   }
 
@@ -66,5 +67,9 @@ require(["_tag-builders", "_dom-readers", "_dom-writers"], function(builders, re
 
   function delRightPara(){
     return builders.delWrap(")");
+  }
+
+  function readContents(id){
+    return readers.readTagContents(id);
   }
 });

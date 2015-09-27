@@ -1,4 +1,4 @@
-define(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_data-readers"], function(readers, writers, builders, arrays, datas){
+require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_data-readers"], function(readers, writers, builders, arrays, datas){
 
   var jaWriterId = "definitions-writer";
   var namaeWriterId = "namae-writer";
@@ -8,34 +8,58 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_dat
   var wagoReaderId =  "wago-reader";
   var kangoReaderId =  "kango-reader";
   var supplementaryReaderId = "corresponding-reader";
+  var namaeReaderId = "namae-reader";
 
-  return { main: main };
+  writers.writeTagsFromBuilderSets(buildSimpleContent());
+  insertKanjiMatchingExpressions();
+  writers.readWordsWriteDfnTags(buildWordSets());
 
-  function main(){
-    writers.writeTagsFromBuilderSets(buildSimpleContent());
-    insertKanjiMatchingWords();
-    writers.readWordsWriteDfnTags(buildWordSets());
+  function insertKanjiMatchingExpressions(){
+    var entityMap = buildEntityMap(readKanji());
+    writeEntityMapToPlaceHolders(entityMap);
   }
 
-  function insertKanjiMatchingWords(){
-    writeWordsToPlaceHolder(readWords());
+  function buildEntityMap(kanji){
+    return idDataPairs(kanji).reduce(function(entityMap, pair){
+      entityMap[pair.id] = pair.data;
+      return entityMap;
+    }, {});
   }
 
-  function readWords(){
-    return datas.readMatcingWords(readKanji());
+  function readWords(kanji){
+    var words = datas.readMatcingWords(kanji);
+    return arrays.removeElements(words, listedWords());
   }
 
-  function readKanji(){
-    return readers.readTagContents("kanji-data-writer");
+  function readNames(kanji){
+    return datas.readMatcingNames(kanji);
   }
 
-  function writeWordsToPlaceHolder(words){
-    arrays.removeElements(words, listedWords());
-    writers.appendTextToElement(supplementaryReaderId, words.join(","));
+  function writeEntityMapToPlaceHolders(entityMap){
+    Object.keys(entityMap).forEach(function(id){
+      writers.appendTextToElement(id, entityMap[id].join(","));
+    });
   }
 
   function listedWords(){
     return readers.readWords([wagoReaderId, kangoReaderId]);
+  }
+
+  function readKanji(){
+    return readers.readTagContents("kanji-reader");
+  }
+
+  function idDataPairs(kanji) {
+    return [
+      {
+        id: supplementaryReaderId,
+      data: readWords(kanji),
+      },
+      {
+        id: namaeReaderId,
+      data: readNames(kanji),
+      },
+    ];
   }
 
   function buildSimpleContent(){
@@ -113,6 +137,7 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_dat
       namae: {
         readerId: "namae-reader",
         writerId: namaeWriterId,
+        seperator: builders.buildBr,
       },
       eigoWago: {
         readerId: wagoReaderId,

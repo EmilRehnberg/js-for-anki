@@ -20,9 +20,16 @@ dfn:hover:after {
 dfn.full:after {
   content: attr(title); }
 
-dfn.character:hover:after, dfn.person:hover:after {
-  content: attr(name) "〔" attr(reading) "〕" attr(ja) "〈" attr(tag) "〉";
-}
+dfn.character { color: #FF0; }
+dfn.character:after { color: #AA0; }
+dfn.location { color: #8CF; }
+dfn.location:after { color: #59B; }
+dfn.person { color: #0F9; }
+dfn.person:after { color: #0A5; }
+dfn.character:after, dfn.location:after, dfn.person:after {
+  content: "〔" attr(reading) "〕" ; }
+dfn.character:hover:after, dfn.location:hover:after, dfn.person:hover:after {
+  content: " " attr(ja) "〈" attr(tag) "〉"; }
 
 dfn:before {
   color: orange;
@@ -41,9 +48,8 @@ dfn:before {
   content: attr(ja);
   color: LawnGreen; }
 
-#definitions-writer dfn:after, #namae-writer dfn:after {
+#definitions-writer dfn:after {
   content: "〔" attr(reading) "〕" attr(ja); }
-
 #reading-writer dfn:after {
   content: "〔" attr(reading) "〕"; }
 #reading-writer dfn:after {

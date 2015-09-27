@@ -25,8 +25,8 @@ function onlyUnique(value, index, self) {
 }
 
 function removeElements(array1, array2){
-  array2.forEach(function(element){
-    array1.splice(array1.indexOf(element), 1)
+  return array1.filter(function(element){
+    return array2.indexOf(element) == -1;
   });
 }
 

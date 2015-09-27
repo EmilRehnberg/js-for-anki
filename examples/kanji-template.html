@@ -6,13 +6,18 @@
 
 <section>
   <header>
-    <p id="kanji-data-writer">追</p>
+    <p id="kanji-data-writer"></p>
+    <p hidden id="kanji-reader">追</p>
   </header>
 
   <article id="base-data-writer"> </article>
-  <article>
+  <article id="bottom">
     <details id="aux-data-writer">
       <summary>詳細</summary>
+      <dl class="stack with-fields en">
+        <dt>英語</dt>
+        <dd id="eigo-writer"></dd>
+      </dl>
     </details>
   </article>
 
@@ -24,6 +29,8 @@
   <p hidden id="old-kango-reader">追跡＝ついせき, tracking, chase, pursuit</p>
   <p hidden id="kango-number-reader"></p>
 
+  <p hidden id="namae-reader"></p>
+
   <p hidden id="chigai-reader">恋愛,養う2</p>
   <p hidden id="old-chigai-reader">泉＝いずみ</p>
 
@@ -34,4 +41,6 @@
 </section>
 
 <script data-main="../_main.js" src="../_require.js"></script>
-<script>require(["_insert-kanji-reading-hint", "_write-base-kanji-data" ,"append-body-html.js"]);</script>
+<script>
+  require(["_write-base-kanji-data" ,"_insert-kanji-reading-hint", "append-body-html.js"]);
+</script>

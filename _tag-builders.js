@@ -89,7 +89,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     dfnTag.setAttribute("ja", nameData[1]);
     dfnTag.setAttribute("tag", nameData[2]);
     dfnTag.className = nameData[3];
-    dfnTag.innerHTML = "»";
+    dfnTag.innerHTML = "»" + name;
     return dfnTag;
   }
 
