@@ -4,27 +4,32 @@ library(tools)
 library(magrittr)
 outFile = "_entity-data.js"
 nameDataDir = "data/names"
-metaFileName = "names-data-meta.csv"
+metaFileName = "names-data-meta.tsv"
 metaPath = file.path(nameDataDir, metaFileName)
 
 readMeta <- function() {
-  read.csv(metaPath, stringsAsFactors=FALSE, row.names=1)
+  read.csv(metaPath,
+           stringsAsFactors=FALSE,
+           sep="\t",
+           row.names=1
+           )
 }
 
 listNameDataFiles <- function(){
-  list.files(nameDataDir, pattern="*csv") %>%
+  list.files(nameDataDir, pattern="*tsv") %>%
     setdiff(metaFileName)
 }
 
-getCsvFilePaths <- function(){
+getTsvFilePaths <- function(){
   listNameDataFiles() %>%
     file.path(nameDataDir, .)
 }
 
-readNameCSV <- function(path){
+readNameTSV <- function(path){
   read.csv(path,
            col.names=c("name", "reading", "description"),
            header=FALSE,
+           sep="\t",
            stringsAsFactors=FALSE
            )
 }
@@ -35,8 +40,8 @@ setNameFileNames <- function(nameFileList){
 }
 
 buildNamesData <- function(){
-  getCsvFilePaths() %>%
-    lapply(., readNameCSV) %>%
+  getTsvFilePaths() %>%
+    lapply(., readNameTSV) %>%
     setNameFileNames
 }
 
@@ -75,7 +80,7 @@ mTimeSecs <- function(path){
 dataIsUpdated <- function(){
   if(!file.exists(outFile)){ return(TRUE) }
   outFileMTime <- mTimeSecs(outFile)
-  nameDataMTimes <- lapply(getCsvFilePaths(), mTimeSecs) %>% unlist
+  nameDataMTimes <- lapply(getTsvFilePaths(), mTimeSecs) %>% unlist
   c(outFileMTime, nameDataMTimes) %>% max != outFileMTime
 }
 
