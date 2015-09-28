@@ -84,7 +84,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     var dfnTag = builder("dfn")();
     var nameData = names[name];
     dfnTag.setAttribute("name", name);
-    if(nameData == undefined){ return dfnTag; }
+    if(nameData == undefined){ return builder("dfn", name)(); }
     dfnTag.setAttribute("reading", nameData[0]);
     dfnTag.setAttribute("ja", nameData[1]);
     dfnTag.setAttribute("tag", nameData[2]);
