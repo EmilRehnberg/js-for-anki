@@ -11,7 +11,6 @@ dfn {
   white-space: pre-wrap; }
 
 dfn:after {
-  content: attr(name);
   color: Khaki; }
 
 dfn:hover:after {
@@ -20,26 +19,51 @@ dfn:hover:after {
 dfn.full:after {
   content: attr(title); }
 
-dfn.character { color: #FF0; }
-dfn.character:after { color: #AA0; }
-dfn.location { color: #8CF; }
-dfn.location:after { color: #59B; }
-dfn.person { color: #0F9; }
-dfn.person:after { color: #0A5; }
-dfn.character:after, dfn.location:after, dfn.person:after {
-  content: "〔" attr(reading) "〕" ; }
-dfn.character:hover:after, dfn.location:hover:after, dfn.person:hover:after {
-  content: " " attr(ja) "〈" attr(tag) "〉"; }
-
 dfn:before {
   color: orange;
   content: attr(word); }
 
-#chigai-writer > dfn:after {
-  color: DarkCyan; }
+dfn.character {
+  color: #FF0; }
 
-#chigai-writer > dfn:before {
-  color: #596F2F; }
+dfn.character:after {
+  color: #AA0; }
+
+dfn.location {
+  color: #8CF; }
+
+dfn.location:after {
+  color: #59B; }
+
+dfn.person {
+  color: #0F9; }
+
+dfn.person:after {
+  color: #0A5; }
+
+dfn.character:hover:after {
+  content: "〔" attr(reading) "〕" attr(ja) "〈" attr(tag) "〉"; }
+
+dfn.character:hover:after[reading=""] {
+  content: attr(ja) "〈" attr(tag) "〉"; }
+
+dfn.location:hover:after {
+  content: "〔" attr(reading) "〕" attr(ja) "〈" attr(tag) "〉"; }
+
+dfn.location:hover:after[reading=""] {
+  content: attr(ja) "〈" attr(tag) "〉"; }
+
+dfn.person:hover:after {
+  content: "〔" attr(reading) "〕" attr(ja) "〈" attr(tag) "〉"; }
+
+dfn.person:hover:after[reading=""] {
+  content: attr(ja) "〈" attr(tag) "〉"; }
+
+#namae-writer dfn:after {
+  content: "〔" attr(reading) "〕"; }
+
+#namae-writer dfn:hover:after {
+  content: " " attr(ja) "〈" attr(tag) "〉"; }
 
 #hint dfn:before {
   content: ""; }
@@ -48,15 +72,26 @@ dfn:before {
   content: attr(ja);
   color: LawnGreen; }
 
+#hint dfn[ja=""]:after {
+  content: attr(en); }
+
 #definitions-writer dfn:after {
   content: "〔" attr(reading) "〕" attr(ja); }
-#reading-writer dfn:after {
-  content: "〔" attr(reading) "〕"; }
-#reading-writer dfn:after {
-  content: "〔" attr(reading) "〕"; }
+
+#definitions-writer dfn[reading=""]:after {
+  content: " " attr(ja); }
 
 #eigo-writer dfn:after {
   content: ": " attr(en); }
 
+#chigai-writer dfn:after {
+  color: DarkCyan; }
+
+#chigai-writer dfn:before {
+  color: #596F2F; }
+
 #reading-writer dfn:after, #chigai-writer dfn:after {
   content: "〔" attr(reading) "〕"; }
+
+dl.dialogue dfn {
+  color: grey; }
