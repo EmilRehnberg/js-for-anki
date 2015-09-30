@@ -14,7 +14,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     buildTableData: buildTableData,
     buildTableHeader: buildTableHeader,
     buildReaderP: buildReaderP,
-    buildWriterP: buildWriterP,
+    buildWriterSection: buildWriterSection,
     delWrap: delWrap,
     spaceSpanBuilder: spaceSpanBuilder,
     stackBuilder: stackBuilder,
@@ -93,14 +93,15 @@ define(["_words-data", "_entity-data"], function(words, names){
     return dfnTag;
   }
 
-  function buildWriterP(id){
-    var pTag = builder("p")();
-    pTag.id = id;
-    return pTag;
+  function buildWriterSection(id){
+    var writerTag = builder("section")();
+    writerTag.id = id;
+    return writerTag;
   }
 
   function buildReaderP(id){
-    var pTag = buildWriterP(id);
+    var pTag = builder("p")();
+    pTag.id = id;
     pTag.setAttribute("hidden", true);
     return pTag;
   }

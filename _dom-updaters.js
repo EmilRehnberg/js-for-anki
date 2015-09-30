@@ -23,7 +23,7 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
 
   function insertClozedTextHint(expr, fullTextId){
     var hintId = "hint";
-    var pHintTag = builders.buildWriterP(hintId);
+    var pHintTag = builders.buildWriterSection(hintId);
 
     writers.appendTags(fullTextId, [pHintTag], "afterEnd");
     var wordSet = {

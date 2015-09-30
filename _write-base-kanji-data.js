@@ -72,7 +72,7 @@ require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_da
       ja: {
         tagId: jaWriterId,
         writerId: baseWriterId,
-        builder: builders.buildWriterP,
+        builder: builders.buildWriterSection,
       },
       jaOldWago: {
         readerId: "old-wago-reader",
@@ -87,12 +87,12 @@ require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_da
       namae: {
         tagId: namaeWriterId,
         writerId: baseWriterId,
-        builder: builders.buildWriterP,
+        builder: builders.buildWriterSection,
       },
       chigai: {
         tagId: chigaiWriterId,
         writerId: baseWriterId,
-        builder: builders.buildWriterP,
+        builder: builders.buildWriterSection,
       },
       chigaiOld: {
         readerId: "old-chigai-reader",
@@ -107,7 +107,7 @@ require(["_dom-readers", "_dom-writers", "_tag-builders", "_array-helpers", "_da
       eigo: {
         tagId: eigoWriterId,
         writerId: "aux-data-writer",
-        builder: builders.buildWriterP,
+        builder: builders.buildWriterSection,
       },
       audio: {
         readerId: "audio-reader",
