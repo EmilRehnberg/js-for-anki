@@ -4,7 +4,6 @@ var domReadersFunctions = {
   readBody: readBody,
   readClassNameElements: readClassNameElements,
   readClozeSpans: readClozeSpans,
-  readCodedHintExpr: readCodedHintExpr,
   readFirstArticle: readFirstArticle,
   readMain: readMain,
   readTagContents: readTagContents,
@@ -35,17 +34,6 @@ function readClozeSpans(){
 
 function readClassNameElements(className){
   return document.getElementsByClassName(className);
-}
-
-function readCodedHintExpr(fullTextId){
-  var cIntRegex = /\[c(\d)\]/g;
-  var cIntMatch = clozedHint().match(cIntRegex);
-  if (cIntMatch){
-    var cInt = parseInt(cIntMatch.toString().substring(2));
-    var spanRegex = /<\/?(span)[^>]*>/igm;
-    var textSpanSplit = readTagContents(fullTextId).split(spanRegex);
-    return textSpanSplit.pop().substr(0,cInt);
-  }
 }
 
 function readAnchorContent(){
@@ -81,10 +69,6 @@ function hasClozedBangHint(content){
 
 function readClozedBangHint(content){
   return content.slice(2,-1);
-}
-
-function clozedHint(){
-  return readClozeSpans()[0].innerHTML;
 }
 
 function readFirstArticle(){
