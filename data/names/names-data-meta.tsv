@@ -2,6 +2,7 @@
 akutou	悪党・重犯罪捜査班	character
 mgs	メタルギアソリッド	character
 cities	日本の町	location
+countries	世界の国	location
 mixed-locations	雑多地域名	location
 prefectures	日本の都道府県の一つ	location
 tokyo-locations	東京都地域名	location
@@ -11,6 +12,7 @@ budo	武道家	person
 climbers	クライマー	person
 minamoto	歴史の人	person
 mixed-persons	雑多人名	person
+ncc	国内研究がんセンター	person
 rekishi	歴史の人	person
 tennou	歴史の人	person
 writers	作家	person
