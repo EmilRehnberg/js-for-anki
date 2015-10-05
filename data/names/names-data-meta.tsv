@@ -1,6 +1,7 @@
 	tag	className
 akutou	悪党・重犯罪捜査班	character
 mgs	メタルギアソリッド	character
+food	食べ物	entity
 cities	日本の町	location
 countries	世界の国	location
 mixed-locations	雑多地域名	location
