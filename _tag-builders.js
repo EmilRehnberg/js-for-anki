@@ -3,6 +3,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     buildAnchor: buildAnchor,
     buildBr: buildBr,
     buildDetailsTag: buildDetailsTag,
+    buildLetter: buildLetter,
     buildWordDfnTag: buildWordDfnTag,
     buildNameDfnTag: buildNameDfnTag,
     buildP: buildP,
@@ -144,6 +145,37 @@ define(["_words-data", "_entity-data"], function(words, names){
   function insertElement(element, adjacentElement){
     element.insertAdjacentElement("beforeEnd", adjacentElement);
     return element;
+  }
+
+  function buildLetter(data){
+    return buildPairs(data).reduce(appendDlPair, builder("dl")());
+  }
+
+  function appendDlPair(dl, pair){
+    if(pair[1]){
+      dl.insertAdjacentElement("beforeEnd", builder("dt", pair[0]+"：")());
+      dl.insertAdjacentElement("beforeEnd", builder("dd", pair[1])());
+    }
+    return dl;
+  }
+
+  function buildTimeMarkUp(time){
+    return ["<time>", time, "</time>"].join("");
+  }
+
+  function buildContentMarkUp(contentArray){
+    return contentArray.join("<br />");
+  }
+
+  function buildPairs(letterData){
+    return [
+      ["差出人", letterData.from],
+      ["受取人", letterData.to],
+      ["日付", buildTimeMarkUp(letterData.time)],
+      ["件名", letterData.topic],
+      ["送信元", letterData.origin],
+      ["内容", buildContentMarkUp(letterData.contents)],
+    ];
   }
 });
 

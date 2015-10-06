@@ -7,6 +7,7 @@ define(["_dom-readers", "_array-helpers", "_object-helpers", "_tag-builders"], f
     insertNameDfnToPlaceHolders: insertNameDfnToPlaceHolders,
     readWordsWriteDfnTags: readWordsWriteDfnTags,
     writeDfnTags: writeDfnTags,
+    writeLetter: writeLetter,
     writeTagsFromBuilderSets: writeTagsFromBuilderSets,
     writeTemplates: writeTemplates,
   };
@@ -33,6 +34,10 @@ define(["_dom-readers", "_array-helpers", "_object-helpers", "_tag-builders"], f
 
   function appendToBody(element){
     readers.readBody().insertAdjacentElement('beforeEnd', element);
+  }
+
+  function writeLetter(contentsMap){
+    appendToBody(builders.buildLetter(contentsMap));
   }
 
   function writeTagsFromBuilderSets(builderSets){
