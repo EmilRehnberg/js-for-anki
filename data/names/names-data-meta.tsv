@@ -8,6 +8,7 @@ cities	日本の町	location
 countries	世界の国	location
 mixed-locations	雑多地域名	location
 prefectures	日本の都道府県の一つ	location
+shrines		御神社	location
 temples	御寺	location
 tokyo-locations	東京都地域名	location
 tokyo-wards	東京都区部	location
