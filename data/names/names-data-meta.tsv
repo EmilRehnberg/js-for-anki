@@ -10,6 +10,7 @@ countries	世界の国	location
 mixed-locations	雑多地域名	location
 prefectures	日本の都道府県の一つ	location
 provinces	日本の令制国の一つ	location
+eight-regions	八地方区分	location
 shrines	御神社	location
 temples	御寺	location
 tokyo-locations	東京都地域名	location
