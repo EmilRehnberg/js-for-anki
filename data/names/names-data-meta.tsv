@@ -5,6 +5,7 @@ mgs	メタルギアソリッド	character
 events	事件	entity
 food	食べ物	entity
 jidai	時代区分の一つ	entity
+judo-waza	柔道技	entity
 cities	日本の町	location
 countries	世界の国	location
 mixed-locations	雑多地域名	location
