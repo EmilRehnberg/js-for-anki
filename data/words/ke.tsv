@@ -1,10 +1,3 @@
-警戒	けいかい		warning; caution
-継続1	けいぞく	そのまま続くこと	continuation (of)
-継続2	けいぞく	中断してはまた続くこと	(〜に) continual(ly)
-結果	けっか		result; outcome
-傑作	けっさく	作品が非常にすぐれたできばえであること。また、その作品。「数々のーを残す」	a masterpiece; a fine piece of work
-県警	けんけい	県の警察	prefecture police
-健康	けんこう	異状があるかないかという面からみた、からだの状態。「ーがすぐれない」	health
 毛	け		fur, hair, wool
 計	けい		plan
 刑	けい		penalty, sentence, punishment
@@ -29,6 +22,7 @@
 傾向	けいこう		tendency, trend, inclination
 蛍光灯	けいこうとう		fluorescent lamp, person who is slow to react
 警告	けいこく		warning, advice
+渓谷	けいこく		valley
 掲載	けいさい		appearance (e.g. article in paper)
 経済	けいざい		economy
 警察	けいさつ	社会公共の秩序と安全を維持するため、国家の統治権に基づき、国民に命令・強制する作用。行政・・。	the police
@@ -39,7 +33,8 @@
 傾斜	けいしゃ		inclination, slant, slope, bevel, list, dip
 形成	けいせい		formation
 形勢	けいせい		condition, situation, prospects
-継続	けいぞく		continuation
+継続1	けいぞく	そのまま続くこと	continuation (of)
+継続2	けいぞく	中断してはまた続くこと	(〜に) continual(ly)
 軽率	けいそつ		rash, thoughtless, careless, hasty
 携帯	けいたい		carrying something
 形態	けいたい		form, shape, figure
@@ -77,7 +72,7 @@
 血圧	けつあつ		blood pressure
 決意	けつい		decision, determination
 血液	けつえき		blood
-結果	けっか		result, consequence
+結果	けっか		result, consequence; outcome
 結核	けっかく		tuberculosis, tubercule
 欠陥	けっかん		defect, fault, deficiency
 血管	けっかん		blood vessel
@@ -87,7 +82,7 @@
 結構	けっこう		splendid, nice, wonderful, delicious, sweet, construction, architecture, well enough, tolerably
 結合	けつごう		combination, union
 結婚	けっこん		marriage
-傑作	けっさく		masterpiece, best work, blunder
+傑作	けっさく	作品が非常にすぐれたできばえであること。また、その作品。「数々のーを残す」	a masterpiece; a fine piece of work
 決算	けっさん		balance sheet, settlement of accounts
 決して	けっして		definitely, by no means, not at all
 結晶	けっしょう		crystal, crystallization
@@ -116,14 +111,16 @@
 券	けん		ticket, coupon, bond, certificate
 圏	けん		sphere, circle, range
 権威	けんい		authority, power, influence
+検閲	けんえつ	査察	inspection
 見解	けんかい		opinion, point of view
 見学	けんがく		inspection, study by observation, field trip
 研究	けんきゅう		study, research
 研究室	けんきゅうしつ		study (room)
 謙虚	けんきょ		modesty, humility
 兼業	けんぎょう		side line, second business
+県警	けんけい	県の警察	prefecture police
 権限	けんげん		power, authority, jurisdiction
-健康	けんこう		health, sound, wholesome
+健康	けんこう	異状があるかないかという面からみた、からだの状態。「ーがすぐれない」	health
 検査	けんさ		inspection (e.g. customs, factory), examination
 健在	けんざい		in good health, well
 検事	けんじ		public prosecutor
@@ -142,7 +139,9 @@
 顕微鏡	けんびきょう		microscope
 見物	けんぶつ		sightseeing, see, look at
 憲法	けんぽう	国家の統治権・統治作用に関する根本原則を定める基礎法。他の法律や命令で変更することのできない国の最高法規。近代諸国では多く成文法の形をとる。→日本国憲法 →大日本帝国憲法	constitution
+拳法	けんぽう	こぶしによる突きや打ち、あるいは足による蹴りを主とした格闘術。中国で古代から発達し、日本には江戸時代初め陳元贇 (ちんげんぴん) らによって伝えられた。「少林寺―」	a Chinese martial art; 〔広い意味で〕kung fu
 賢明	けんめい		wisdom, intelligence, prudence
+懸命	けんめい	力のかぎり努めるさま。全力をつくすさま。精一杯。「―な努力」「―にこらえる」「一生―」	hard; eagerness; strenuous
 倹約	けんやく		thrift, economy, frugality
 兼用	けんよう		multi-use, combined use, combination, serving two purposes
 権利	けんり	一定の利益を自分のために主張し、また、これを享受することができる法律上の能力。私権と公権とに分かれる。「店のーを譲る」<->義務。->ライツ（rights）	right, privilege
