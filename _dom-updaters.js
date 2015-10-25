@@ -1,4 +1,4 @@
-define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], function(readers, writers, builders, strings){
+define(["_dom-readers", "_dom-writers", "_tag-builders", "_expression"], function(readers, writers, builders, Expression){
   var domUpdaterFunctions = {
     insertHint: insertHint,
     replaceWithLength: replaceWithLength,
@@ -7,7 +7,8 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
 
   return domUpdaterFunctions;
 
-  function insertHint(expression, fullTextId){
+  function insertHint(expressionText, fullTextId){
+    var expression = Expression({ text: expressionText });
     replaceClozedWLength(expression);
     insertClozedTextHint(expression, fullTextId);
   }
@@ -18,7 +19,7 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
 
     writers.appendTags(fullTextId, [pHintTag], "afterEnd");
     var wordSet = {
-      words: [expr],
+      words: [expr.text],
       writerId: hintId,
     };
     writers.writeDfnTags(wordSet);
@@ -32,11 +33,7 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_string-helpers"], fun
   }
 
   function replaceWithLength(element, expression){
-    element.innerHTML = dottifyExpression(expression);
-  }
-
-  function dottifyExpression(expression){
-    return strings.dottifyTxt(strings.removeNumbers(expression));
+    element.innerHTML = expression.dottify();
   }
 
   function replaceRomanWord(word, element){

@@ -1,6 +1,8 @@
 define(function(){
   return {
-    dottifyTxt: dottifyTxt,
+    nDots: nDots,
+    readInitialNum: readInitialNum,
+    removeInitialNum: removeInitialNum,
     removeNumbers: removeNumbers,
   };
 
@@ -8,7 +10,15 @@ define(function(){
     return expression.replace(/[\d]/g, "");
   }
 
-  function dottifyTxt(expression){
-    return expression.replace(/./g, "・");
+  function removeInitialNum(text){
+    return text.replace(/\d+/, "");
+  }
+
+  function readInitialNum(expression){
+    return parseInt(expression);
+  }
+
+  function nDots(n){
+    return "・".repeat(n);
   }
 });
