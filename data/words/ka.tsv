@@ -3,6 +3,7 @@
 個	か		article counter
 課	か		counter for chapters (of a book)
 科	か		department, section
+禍2	か	災い。ふしあわせ。「―を転じて福となす」⇔福。	disaster
 下位	かい		low rank, subordinate, lower order (e.g. byte)
 貝	かい		shell, shellfish
 回	かい		counter for occurrences
@@ -124,7 +125,9 @@
 係り	かかり		official, duty, person in charge
 係長	かかりちょう	官庁・会社などでの役職の一。その部署の係員の長で、普通は課長の下の地位。	a subsection chief
 掛かる	かかる		take (time), need, cost
-係わる	かかわる		concern oneself in, have to do with, affect, influence
+係わる	かかわる	重大なつながりをもつ。影響が及ぶ。「命に―・る問題」	concern oneself in, have to do with, affect, influence
+関わる	かかわる	 関係をもつ。関係する。関する。「研究に―・った人々」	have to do ((with))⇒かんけい(関係)
+拘る	かかわる	こだわる。「つまらぬことに―・っている場合ではない」	fixate; fuss over; be concerned
 下記	かき	ある記事や文章のあとに書きしるすこと。また、その文章。「詳細は―のとおり」⇔上記。	the following
 鍵	かぎ		key
 書留	かきとめ		writing down, putting on record
@@ -173,6 +176,8 @@
 確率	かくりつ		probability
 閣僚	かくりょう	ミニスター	minister
 隠れる	かくれる		hide, be hidden, conceal oneself, disappear
+寡欲	かよく	欲が少ないこと。また、そのさま。「―な（の）人」	unselfishness
+寡君	かくん	他国の人に対して自分の主君をへりくだっていう語。	(humble word for lord towards other countries?)
 掛け	かけ		credit
 賭け	かけ		betting, gambling, a gamble
 陰	かげ		shade, shadow, other side
@@ -207,6 +212,7 @@
 飾り	かざり		decoration
 飾る	かざる	他の物を添えたり、手を加えたりするなどして、美しく見せるようにする。装飾する。「食卓を花で―・る」	decorate
 火山	かざん		volcano
+火山灰	かざんばい		volcanic ashes
 菓子	かし		pastry
 貸し	かし		loan, lending
 火事	かじ		fire
@@ -229,6 +235,7 @@
 過剰	かじょう		excess
 箇条書き	かじょうがき		itemized form, itemization
 貸す	かす		lend
+課す	かす		〔負わせる〕impose ((a task on [upon] a person)); 〔割り当てる〕assign ((a task to a person))
 数1	かず		number, figure
 微か	かすか		faint, dim, weak, indistinct, hazy, poor, wretched
 化する	かする		to change into, to convert into, to transform, to be reduced, to influence, to improve (someone)
@@ -277,7 +284,7 @@
 固める	かためる		to harden, to freeze, to fortify
 片寄る	かたよる		be one-sided, partial, prejudiced, biased, lean, be inclined
 偏る	かたよる		to be one-sided, to incline, to be partial, to be prejudiced, to lean, to be biased
-語る	かたる		talk, tell, recite
+語る	かたる	話す。特に、まとまった内容を順序だてて話して聞かせる。「目撃者の―・るところによれば」「決意の程を―・る」	talk, tell, recite
 傍ら	かたわら		beside(s), while, nearby
 花壇	かだん		flower bed
 価値	かち		value, worth, merit
@@ -294,6 +301,7 @@
 格好	かっこう		shape, form, appearance, manner
 各国	かっこく	それぞれの国。「―首脳」	every [each] country [nation]; 〔諸国〕various countries [states]; 〔万国〕all states [countries]
 活字	かつじ		printing type
+褐色	かっしょく		brown
 曽て	かつて	過去のある一時期を表す語。以前。昔。	once; formerly
 勝手	かって	他人のことはかまわないで、自分だけに都合がよいように振る舞うこと。「そんな-は許さない」	selfishness; own convenience
 活動	かつどう		action, activity
@@ -328,7 +336,7 @@
 兼ねて	かねて		simultaneously
 鐘紡	かねぼう	（会社の名前）	KaneBou (company name)
 金持ち	かねもち		rich man
-兼ねる	かねる		hold (position), serve, be unable, be beyond one´s ability, cannot, hesitate to, combine with, use with, be impatient
+兼ねる	かねる	一つの物が二つ以上の働きを合わせもつ。一つの物が二つ以上の用をする。「大は小を―・ねる」「書斎と応接間とを―・ねた部屋」	hold (position), serve, be unable, be beyond one´s ability, cannot, hesitate to, combine with, use with, be impatient
 可能	かのう		possible, practicable, feasible
 可能性	かのうせい	物事が実現できる見込み。	possibility
 彼女	かのじょ		she
@@ -346,6 +354,7 @@
 壁	かべ		wall
 貨幣	かへい		money, currency, coinage
 釜	かま		iron pot, kettle
+窯	かま		kiln
 構う	かまう		mind, care about, be concerned about
 構え	かまえ		posture, pose, style
 構える	かまえる		to set up
@@ -424,9 +433,11 @@
 簡易	かんい		simplicity, easiness, quasi-
 間隔	かんかく	 物と物とのあいだの距離。「ーを置いて並ぶ」	interval; space (spacial; or in text)
 感慨	かんがい		strong feelings, deep emotion
+管外	かんがい	権限の及ぶ区域の外。管轄区域の外。⇔管内。	outside jurisdiction (of a police station)
 考え	かんがえ		thinking, thought, ideas, intention
 考える	かんがえる		think
 感覚	かんかく		sense, sensation
+管轄	かんかつ		jurisdiction; control
 換気	かんき		ventilation
 寒気	かんき		cold, frost, chill
 換気扇	かんきせん	家屋の壁や窓などに取り付け、モーターで羽根を回転させて室内の空気を排出する電気器具。	a ventilation fan; ((英)) an extractor fan
@@ -449,6 +460,7 @@
 関西	かんさい		Kansai (SW half of Japan, including Osaka)
 観察	かんさつ		observation, survey
 換算	かんさん		conversion, change, exchange
+閑散	かんさん		quiet, leisure, inactivity
 監視	かんし		observation, guarding, inspection, surveillance
 漢字	かんじ		Chinese characters, kanji
 感じ	かんじ		feeling, sense, impression
@@ -484,12 +496,14 @@
 官庁	かんちょう		government office, authorities
 艦長	かんちょう	1隻の軍艦の乗組員を指揮統率する最高責任者。	(e.g. submarine) captain
 缶詰	かんづめ		canning, canned goods, tin can
+官邸	かんてい	大臣や長官など高級官吏の在任中に、住居として政府が提供する邸宅。「首相―」	an official residence
 観点	かんてん		point of view
 乾電池	かんでんち		dry cell, battery
 感度	かんど		sensitivity, severity (quake)
 関東	かんとう		Kantou (eastern half of Japan, including Tokyo)
 感動	かんどう		being deeply moved, deep emotion, excitement, impression
 監督	かんとく		supervision, control, superintendence
+管内	かんない	その役所が管轄する区域の内。⇔管外。	within jurisdiction (of this police station)
 観念	かんねん		idea, notion, conception, sense (e.g. of duty), resignation, preparedness, acceptance
 乾杯	かんぱい		toast (drink)
 看板	かんばん		sign, signboard, doorplate, poster, billboard, appearance, figurehead, policy, attraction, closing time
@@ -499,6 +513,7 @@
 勘弁	かんべん		pardon, forgiveness, forbearance
 冠2	かんむり		crown, cap, first, best, peerless, naming, designating, top kanji radical
 感無量	かんむりょう		deep feeling, inexpressible feeling, filled with emotion
+艦名	かんめい		ship's name
 勧誘	かんゆう		invitation, solicitation, canvassing, inducement, persuasion, encouragement
 関与	かんよ		participation, taking part in, participating in, being concerned in
 寛容	かんよう		forbearance, tolerance, generosity
@@ -510,7 +525,7 @@
 官僚	かんりょう		bureaucrat, bureaucracy
 慣例	かんれい		custom, precedent, of convention
 還暦	かんれき		60th birthday
-関連	かんれん		relation, connection, relevance
+関連	かんれん	ある事柄と他の事柄との間につながりがあること。連関。「―が深い」「―する事柄」「―性」「―質問」	relation, connection, relevance
 貫禄	かんろく		presence, dignity
 緩和	かんわ		relief, mitigation
 漢和	かんわ		Chinese-Japanese (e.g. dictionary)
