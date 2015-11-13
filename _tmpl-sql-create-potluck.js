@@ -2,8 +2,8 @@ define(["_code-builders"], function(codes){
   var io = [
     {
       i: [
-        "CREATE TABLE POTLUCK (",
-        "  id INT PRIMARY KEY AUTO_INCREMENT,",
+        "CREATE TABLE potluck (",
+        "           id INT PRIMARY KEY AUTO_INCREMENT,",
         "  signup_date DATE",
         ");",
       ],
