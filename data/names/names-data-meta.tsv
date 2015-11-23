@@ -11,6 +11,7 @@ jidai	時代区分の一つ	entity
 judo-waza	柔道技	entity
 mixed-entities	雑多物	entity
 cities	日本の町	location
+castles	日本の城	location
 chuugoku-chiri	中国地理	location
 countries	世界の国	location
 mixed-locations	雑多地域名	location
