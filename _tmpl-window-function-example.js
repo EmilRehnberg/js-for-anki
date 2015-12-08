@@ -5,7 +5,6 @@ define(["_code-builders"], function(codes){
         "SELECT depname, empno, salary, avg(salary)",
         "  OVER (PARTITION BY depname)",
         "  FROM empsalary;",
-        ");",
       ],
       o: [
         "  depname  | empno | salary |  avg   ",
