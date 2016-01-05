@@ -1,7 +1,7 @@
 require 'pathname'
 
 class DataCompiler
-  BUILD_NAME_MODULE_SCRIPT_PATH = "data/names/concat-name-data.R"
+  BUILD_NAME_MODULE_SCRIPT_PATH = "data/compile-names-from-db.R"
   BUILD_WORDS_MODULE_SCRIPT_PATH = "data/compile-words-from-db.R"
 
   def self.run
