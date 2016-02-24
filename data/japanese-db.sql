@@ -4,7 +4,7 @@
 
 -- Dumped from database version 9.4.5
 -- Dumped by pg_dump version 9.4.0
--- Started on 2016-02-11 17:30:44 CET
+-- Started on 2016-02-24 09:33:05 CET
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -14,8 +14,8 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 
 --
--- TOC entry 2293 (class 1262 OID 16441)
--- Dependencies: 2292
+-- TOC entry 2300 (class 1262 OID 16441)
+-- Dependencies: 2299
 -- Name: 日本語; Type: COMMENT; Schema: -; Owner: e
 --
 
@@ -23,7 +23,7 @@ COMMENT ON DATABASE "日本語" IS 'DB for japanese language data.';
 
 
 --
--- TOC entry 175 (class 3079 OID 12123)
+-- TOC entry 176 (class 3079 OID 12123)
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
 --
 
@@ -31,8 +31,8 @@ CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- TOC entry 2296 (class 0 OID 0)
--- Dependencies: 175
+-- TOC entry 2303 (class 0 OID 0)
+-- Dependencies: 176
 -- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: 
 --
 
@@ -42,7 +42,7 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 SET search_path = public, pg_catalog;
 
 --
--- TOC entry 532 (class 1247 OID 16509)
+-- TOC entry 534 (class 1247 OID 16509)
 -- Name: name_class; Type: TYPE; Schema: public; Owner: e
 --
 
@@ -57,7 +57,7 @@ CREATE TYPE name_class AS ENUM (
 ALTER TYPE name_class OWNER TO e;
 
 --
--- TOC entry 535 (class 1247 OID 16596)
+-- TOC entry 537 (class 1247 OID 16596)
 -- Name: name_tag; Type: TYPE; Schema: public; Owner: e
 --
 
@@ -106,7 +106,7 @@ CREATE TYPE name_tag AS ENUM (
 ALTER TYPE name_tag OWNER TO e;
 
 --
--- TOC entry 529 (class 1247 OID 16495)
+-- TOC entry 531 (class 1247 OID 16495)
 -- Name: word_tag; Type: TYPE; Schema: public; Owner: e
 --
 
@@ -117,14 +117,18 @@ CREATE TYPE word_tag AS ENUM (
     '菌類',
     '形動',
     '名',
-    'スル'
+    'スル',
+    '副',
+    '格助',
+    '接助',
+    '助動'
 );
 
 
 ALTER TYPE word_tag OWNER TO e;
 
 --
--- TOC entry 188 (class 1255 OID 16486)
+-- TOC entry 189 (class 1255 OID 16486)
 -- Name: impute_missing_pronouncation(); Type: FUNCTION; Schema: public; Owner: e
 --
 
@@ -143,8 +147,43 @@ $$;
 
 ALTER FUNCTION public.impute_missing_pronouncation() OWNER TO e;
 
+SET default_tablespace = '';
+
+SET default_with_oids = false;
+
 --
--- TOC entry 549 (class 1255 OID 16493)
+-- TOC entry 175 (class 1259 OID 16944)
+-- Name: tmp_table; Type: TABLE; Schema: public; Owner: e; Tablespace: 
+--
+
+CREATE TABLE tmp_table (
+    defs text[],
+    tags word_tag[]
+);
+
+
+ALTER TABLE tmp_table OWNER TO e;
+
+--
+-- TOC entry 190 (class 1255 OID 16950)
+-- Name: mix_definitions_and_tags(tmp_table); Type: FUNCTION; Schema: public; Owner: e
+--
+
+CREATE FUNCTION mix_definitions_and_tags(tmp_table) RETURNS SETOF text
+    LANGUAGE sql
+    AS $_$
+  SELECT CASE WHEN $1.defs <> '{}' THEN
+    COALESCE('［'||array_to_string($1.tags,'・')||'］', '') || UNNEST($1.defs)
+  ELSE
+    ''
+  END
+$_$;
+
+
+ALTER FUNCTION public.mix_definitions_and_tags(tmp_table) OWNER TO e;
+
+--
+-- TOC entry 555 (class 1255 OID 16493)
 -- Name: array_cat_agg(anyarray); Type: AGGREGATE; Schema: public; Owner: e
 --
 
@@ -155,10 +194,6 @@ CREATE AGGREGATE array_cat_agg(anyarray) (
 
 
 ALTER AGGREGATE public.array_cat_agg(anyarray) OWNER TO e;
-
-SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- TOC entry 172 (class 1259 OID 16478)
@@ -179,7 +214,7 @@ CREATE TABLE goi (
 ALTER TABLE goi OWNER TO e;
 
 --
--- TOC entry 2297 (class 0 OID 0)
+-- TOC entry 2304 (class 0 OID 0)
 -- Dependencies: 172
 -- Name: TABLE goi; Type: COMMENT; Schema: public; Owner: e
 --
@@ -190,7 +225,7 @@ Uses array types for the definition columns.';
 
 
 --
--- TOC entry 2298 (class 0 OID 0)
+-- TOC entry 2305 (class 0 OID 0)
 -- Dependencies: 172
 -- Name: COLUMN goi."和"; Type: COMMENT; Schema: public; Owner: e
 --
@@ -199,7 +234,7 @@ COMMENT ON COLUMN goi."和" IS '日本語定義達。';
 
 
 --
--- TOC entry 2299 (class 0 OID 0)
+-- TOC entry 2306 (class 0 OID 0)
 -- Dependencies: 172
 -- Name: COLUMN goi."英"; Type: COMMENT; Schema: public; Owner: e
 --
@@ -237,7 +272,7 @@ CREATE TABLE names_metadata (
 ALTER TABLE names_metadata OWNER TO e;
 
 --
--- TOC entry 2285 (class 0 OID 16478)
+-- TOC entry 2291 (class 0 OID 16478)
 -- Dependencies: 172
 -- Data for Name: goi; Type: TABLE DATA; Schema: public; Owner: e
 --
@@ -252,7 +287,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 愛	あい	{}	{love}	\N	\N	\N
 相変わらず	あいかわらず	{}	{"as ever; as usual; the same"}	\N	\N	\N
 愛嬌	あいきょう	{}	{"charm; attrictiveness"}	\N	\N	\N
-挨拶	あいさつ	{}	{greeting}	\N	\N	\N
 頁	ぺーじ	{"本や新聞など印刷物の構成要素。 ページを参照。"}	{page}	\N	\N	\N
 ぺろぺろ	ぺろぺろ	{舌で物をなめまわすさま。}	{"the sound of licking"}	\N	\N	\N
 留守番	るすばん	{}	{care-taking;caretaker;house-watching}	\N	\N	\N
@@ -301,6 +335,7 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 商人	あきうど	{}	{"trader; shopkeeper; merchant"}	\N	\N	\N
 空き	あき	{}	{"room; time to spare; emptiness; vacant"}	\N	{明き}	\N
 曖昧	あいまい	{}	{"な 〔不明瞭な〕unclear; 〔明確につかめない〕vague; 〔どっちつかずの〕noncommittal; 〔多義・両義にとれる〕ambiguous; 〔いかようにもとれる〕equivocal"}	\N	\N	\N
+挨拶	あいさつ	{}	{greeting}	{名,スル}	\N	\N
 握手	あくしゅ	{}	{handshake}	\N	\N	\N
 欠伸	あくび	{眠いとき、疲れたときなどに思わず口が大きく開いて息を深く吸い込み、やや短く吐き出す呼吸運動。}	{yawn}	\N	\N	\N
 悪日	あくび	{}	{"unlucky day"}	\N	\N	\N
@@ -706,7 +741,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 分裂	ぶんれつ	{一つのまとまりが、いくつかのものに分かれること。「会がーする」}	{"split; division; break up"}	\N	\N	\N
 地	ち	{}	{earth}	\N	\N	\N
 血	ち	{}	{blood}	\N	\N	\N
-治安	ちあん	{}	{"public order"}	\N	\N	\N
 地位	ちい	{}	{"(social) position; status"}	\N	\N	\N
 地域	ちいき	{}	{"area; region"}	\N	\N	\N
 小さい	ちいさい	{}	{"small; little; tiny"}	\N	\N	\N
@@ -841,7 +875,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 聴講	ちょうこう	{}	{"lecture attendance; auditing"}	\N	\N	\N
 彫刻	ちょうこく	{}	{"carving; engraving; sculpture"}	\N	\N	\N
 調査	ちょうさ	{}	{"investigation; examination; inquiry; survey"}	\N	\N	\N
-調子	ちょうし	{}	{"tune; tone; key; pitch; time; rhythm; vein; mood; way; manner; style; knack; condition; state of health; strain; impetus; spur of the moment; trend"}	\N	\N	\N
 徴収	ちょうしゅう	{}	{"collection; levy"}	\N	\N	\N
 聴衆	ちょうしゅう	{}	{"an audience"}	\N	\N	\N
 長所	ちょうしょ	{}	{"strong point; merit; advantage"}	\N	\N	\N
@@ -860,6 +893,7 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 朝廷	ちょうてい	{天子が政治を行う所。廟堂 (びょうどう) 。朝堂。また、天子が政治を行う機関。}	{"the Imperial Court"}	\N	\N	\N
 頂点	ちょうてん	{}	{"top; summit"}	\N	\N	\N
 恰度	ちょうど	{}	{"just; right; exactly"}	\N	\N	\N
+調子	ちょうし	{"1 活動するものの状態・ぐあい。「からだの―をくずす」「エンジンの―を見る」",音の高低のぐあい。また、音の速さのぐあい。リズム。拍子。「カラオケの―が合わない」「足で―をとる」}	{"〔具合〕condition; state of health","tune; tone; key; pitch; time; rhythm; vein; mood; way; manner; style; knack; strain; impetus; spur of the moment; trend"}	\N	\N	\N
 丁度	ちょうど	{ある基準に、過不足なく一致するさま。きっかり。ぴったり。きっちり。}	{"exactly; precisely"}	\N	\N	\N
 長男	ちょうなん	{}	{"eldest son"}	\N	\N	\N
 長編	ちょうへん	{}	{"long (e.g. novel film)"}	\N	\N	\N
@@ -1560,7 +1594,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 外す	はずす	{}	{"unfasten; remove"}	\N	\N	\N
 弾む	はずむ	{}	{"to spring; to bound; to bounce; to be stimulated; to be encouraged; to get lively; to treat oneself to; to splurge on"}	\N	\N	\N
 外れ値	はずれち	{統計学の用語で、データの全体的な傾向から大きく離れた値のこと。}	{outlier}	\N	\N	\N
-外れる	はずれる	{}	{"be disconnected; get out of place; be off; be out (e.g. of gear)"}	\N	\N	\N
 破損	はそん	{}	{damage}	\N	\N	\N
 機	はた	{}	{loom}	\N	\N	\N
 旗	はた	{}	{flag}	\N	\N	\N
@@ -1750,7 +1783,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 隔たり	へだたり	{へだたること。また、その度合い。「十年のー」間隔。距離。差。}	{"distance; difference"}	\N	\N	\N
 隔たる	へだたる	{}	{"to be distant"}	\N	\N	\N
 隔てる	へだてる	{}	{"be shut out; separate; isolate"}	\N	\N	\N
-部屋	へや	{}	{room}	\N	\N	\N
 減らす	へらす	{}	{"abate; decrease; diminish; shorten"}	\N	\N	\N
 謙る	へりくだる	{}	{"to deprecate oneself and praise the listener"}	\N	\N	\N
 減る	へる	{}	{"decrease (in size or number); diminish; abate"}	\N	\N	\N
@@ -1817,7 +1849,6 @@ COPY goi ("単語", "発音", "和", "英", tags, alternate_writing, alternate_r
 引き出す	ひきだす	{}	{"to pull out; to take out; to draw out; to withdraw"}	\N	\N	\N
 引出す	ひきだす	{}	{"pull out; take out; draw out; withdraw"}	\N	\N	\N
 引き止める	ひきとめる	{}	{"detain; restrain"}	\N	\N	\N
-引き取る	ひきとる	{}	{"to take charge of; to take over; to retire to a private place"}	\N	\N	\N
 引き離す	ひきはなす	{分ける・引っ張って離す。無理に離れさせる}	{"pull from (someone or something)"}	\N	\N	\N
 卑怯	ひきょう	{}	{"cowardice; meanness; unfairness"}	\N	\N	\N
 引き分け	ひきわけ	{勝負事で、決着がつかず、双方勝ち負けなしとして終えること。「試合をーに持ち込む」}	{"a draw (in competition); tie game"}	\N	\N	\N
@@ -2039,7 +2070,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 保健	ほけん	{}	{"health preservation; hygiene; sanitation"}	\N	\N	\N
 保険	ほけん	{}	{"insurance; guarantee"}	\N	\N	\N
 矛	ほこ	{}	{halbard}	\N	\N	\N
-保護	ほご	{}	{"care; protection; shelter; guardianship; favor; patronage"}	\N	\N	\N
 誇り	ほこり	{}	{pride}	\N	\N	\N
 誇る	ほこる	{}	{"to boast of; to be proud of"}	\N	\N	\N
 綻びる	ほころびる	{}	{"to come apart at the seams; to begin to open; to smile broadly"}	\N	\N	\N
@@ -2088,6 +2118,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 辺り	ほとり	{}	{"(in the) neighbourhood; vicinity; nearby"}	\N	\N	\N
 保証	ほしょう	{}	{"guarantee; security; assurance; pledge; warranty"}	\N	{保障}	\N
 捕捉	ほそく	{とらえること。つかまえること。「賊を―する」「意図を―する」}	{"capture; seizure"}	\N	\N	\N
+保護	ほご	{"1 外からの危険・脅威・破壊などからかばい守ること。「傷口を―する」「森林を―する」","2 応急の救護を要する理由のあるとき、警察署などに留め置くこと。「迷子を―する」"}	{"〔守ること〕protection; 〔警察による〕protective custody; 〜する protect; 〔主に教会が庇護する〕give sanctuary ((to)); 〔面倒をみる〕take care of","〔保存，維持〕preservation; conservation (▼国家などによる自然保護に使われることが多い) ⇒ほぞん(保存)"}	\N	\N	\N
 本体	ほんたい	{}	{"substance; real form; object of worship"}	\N	\N	\N
 本棚	ほんだな	{}	{bookshelves}	\N	\N	\N
 本当	ほんとう	{偽りや見せかけでなく、実際にそうであること。「一見難しそうだが―は易しい」「うわさは―だ」}	{"truth; reality"}	\N	\N	\N
@@ -2107,7 +2138,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 普通	ふつう	{特に変わっていないこと。；通常}	{"usual; common"}	\N	\N	\N
 不凍液	ふとうえき	{"不凍剤。 アンチフリーズ"}	{antifreeze}	\N	\N	\N
 歩	ふ	{}	{"pawn (in chess or shogi)"}	\N	\N	\N
-不安	ふあん	{}	{"anxiety; uneasiness; insecurity; suspense"}	\N	\N	\N
 不意	ふい	{}	{"sudden; abrupt; unexpected; unforeseen"}	\N	\N	\N
 封	ふう	{}	{seal}	\N	\N	\N
 風景	ふうけい	{}	{scenery}	\N	\N	\N
@@ -2131,7 +2161,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 更かす	ふかす	{夜遅くまで起きている。夜ふかしをする。「議論で夜をー・す」}	{"stay up 「till late [at night]"}	\N	\N	\N
 不可能	ふかのう	{}	{impossible}	\N	\N	\N
 深まる	ふかまる	{}	{"deepen; heighten; intensify"}	\N	\N	\N
-深める	ふかめる	{}	{"to deepen; to heighten; to intensify"}	\N	\N	\N
 不規則	ふきそく	{}	{"irregularity; unsteadiness; disorderly"}	\N	\N	\N
 不吉	ふきつ	{縁起が悪いこと。不運の兆しがあること。また、そのさま。不祥。「―な予感がする」「―な夢」}	{"ominous; sinister; bad luck; ill omen; inauspiciousness"}	\N	\N	\N
 普及	ふきゅう	{}	{"diffusion; spread"}	\N	\N	\N
@@ -2145,6 +2174,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 復旧	ふくきゅう	{}	{"restoration; restitution; rehabilitation"}	\N	\N	\N
 複合	ふくごう	{}	{"composite; complex"}	\N	\N	\N
 不当	ふとう	{正当・適当でないこと。道理に合わないこと。「―な手段」「―解雇」}	{unjust}	\N	\N	\N
+不安	ふあん	{気がかりで落ち着かないこと。心配なこと。また、そのさま。気がかり。「―を抱く」「―に襲われる」「―な毎日」「夜道は―だ」}	{"〔心配〕uneasiness (about); anxiety (about); worry (about/over)〔不安定〕insecurity〔社会的動揺〕unrest"}	{名,形動}	\N	\N
+深める	ふかめる	{物事の程度を深くする。「親睦 (しんぼく) を―・める」「改めて認識を―・める」}	{"to deepen; to heighten; to intensify"}	\N	\N	\N
 複雑	ふくざつ	{}	{complicated}	\N	\N	\N
 副詞	ふくし	{}	{adverb}	\N	\N	\N
 福祉	ふくし	{公的配慮によって社会の成員が等しく受けることのできる安定した生活環境。「公共ー」「ー事業」}	{"welfare; well-being"}	\N	\N	\N
@@ -2183,7 +2214,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 負傷	ふしょう	{}	{"injury; wound"}	\N	\N	\N
 不祥事	ふしょうじ	{関係者にとって不都合な事件、事柄。類語：凶事・弔事「社員がーを起こす」}	{"scandal; a disgraceful [deplorable] affair"}	\N	\N	\N
 不振	ふしん	{}	{"dullness; depression; slump; stagnation"}	\N	\N	\N
-不審	ふしん	{}	{"incomplete understanding; doubt; question; distrust; suspicion; strangeness; infidelity"}	\N	\N	\N
 夫人	ふじん	{}	{"wife; Mrs.; madam"}	\N	\N	\N
 婦人	ふじん	{}	{"woman; female"}	\N	\N	\N
 伏す	ふす	{腹ばいになる。また、地面にひざをつくなどして頭を深く下げる。「地にー・す」}	{"bow down; bend down"}	\N	\N	\N
@@ -2196,6 +2226,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 附属	ふぞく	{}	{"attached; belonging; affiliated; annexed; associated; subordinate; incidental; dependent; auxiliary"}	\N	{付属}	\N
 相応しい	ふさわしい	{似つかわしい。つり合っている。「収入に―・い生活」「子供に―・くない遊び」「あの男性なら彼女に―・い」}	{"〔適している〕be suitable ((for)); be fit ((for a thing; to do)); 〔よく似合う〕become; 〔値する〕deserve; be worthy ((of))"}	\N	\N	\N
 蓋	ふた	{}	{"〔箱・器などの〕a lid ((of a pot","a jar)); 〔びんなどの〕the cap ((of a bottle)); 〔覆い〕a cover; 〔さざえ・たにし類の甲〕an operculum"}	\N	\N	\N
+不審	ふしん	{疑わしく思うこと。疑わしく思えること。また、そのさま。疑い。疑問。疑惑。疑念。疑心。「証言に―な点が多い」「お吉の居ぬを―して何所へと問えば」}	{"incomplete understanding; doubt; question; distrust; suspicion; strangeness; infidelity"}	\N	\N	\N
 再び	ふたたび	{}	{"again; once more; a second time"}	\N	\N	\N
 二つ	ふたつ	{}	{two}	\N	\N	\N
 負担	ふたん	{荷物を肩や背にかつぐこと。また、その荷物。義務・責任などを引き受けること。また、その義務・責任など。「費用は全員でーする」}	{"burden; charge; responsibility"}	\N	\N	\N
@@ -2247,7 +2278,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 振り仮名	ふりがな	{}	{"hiragana over kanji; pronunciation key"}	\N	\N	\N
 振り込む	ふりこむ	{}	{"Make a payment via bank deposit transfer"}	\N	\N	\N
 振り出し	ふりだし	{}	{"outset; starting point; drawing or issuing (draft)"}	\N	\N	\N
-不良	ふりょう	{}	{"badness; delinquent; inferiority; failure"}	\N	\N	\N
 浮力	ふりょく	{}	{"buoyancy; floating power"}	\N	\N	\N
 降る	ふる	{}	{"to precipitate; to fall (e.g. rain)"}	\N	\N	\N
 振る	ふる	{}	{"wave; shake; swing; sprinkle; cast (actor); allocate (work)"}	\N	\N	\N
@@ -2263,7 +2293,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 雰囲気	ふんいき	{}	{"atmosphere (e.g. musical); mood; ambience"}	\N	\N	\N
 噴火	ふんか	{}	{eruption}	\N	\N	\N
 憤慨	ふんがい	{}	{"indignation; resentment"}	\N	\N	\N
-紛糾	ふんきゅう	{}	{"complication; confusion"}	\N	\N	\N
 紛失	ふんしつ	{}	{"losing something"}	\N	\N	\N
 噴出	ふんしゅつ	{}	{"spewing; gushing; spouting; eruption; effusion"}	\N	\N	\N
 噴水	ふんすい	{}	{"water fountain"}	\N	\N	\N
@@ -2289,14 +2318,15 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 家出	いえで	{}	{"running away from home; leaving home"}	\N	\N	\N
 硫黄	いおう	{}	{"sulfur，(英) sulphur (記号S)"}	\N	\N	\N
 以下	いか	{}	{"~ or less than?not more than"}	\N	\N	\N
-以外	いがい	{}	{"except for; other than"}	\N	\N	\N
-意外	いがい	{}	{"unexpected; surprising"}	\N	\N	\N
 如何	いかが	{}	{"how; in what way"}	\N	\N	\N
 威嚇	いかく	{}	{"threat; malice"}	\N	\N	\N
 医学	いがく	{}	{"medical science"}	\N	\N	\N
 生かす	いかす	{生き返らせる}	{"spare a person's life; bring ((a person)) back to life; revive ((a person)); make use of; utilize"}	\N	\N	\N
 如何に	いかに	{}	{"how?; in what way?; how much?; however; whatever"}	\N	\N	\N
 分	ふん	{}	{minute}	\N	\N	\N
+意外	いがい	{考えていた状態と非常に違っていること。また、そのさま。思いのほか。案外。思いがけない。「事件は―な展開を見せた」「―に背が高い」}	{"unexpected; surprising 〜な unexpected; surprising"}	{名,形動}	\N	\N
+以外	いがい	{}	{"except for; other than"}	\N	\N	\N
+紛糾	ふんきゅう	{意見や主張などが対立してもつれること。ごたごた。紛乱。紛擾。「予算委員会が―する」}	{"（複雑化）complication; confusion; a tangle"}	{名,スル}	\N	\N
 遺憾	いかん	{反省}	{resentment}	\N	\N	\N
 胃癌	いがん	{胃に発生する悪性腫瘍 (しゅよう) 。初期には自覚症状がないが、進行するにつれ食欲不振や胃の不快感から、しだいに吐血・下血などの症状がみられるようになる。}	{"stomach cancer"}	\N	\N	\N
 息	いき	{}	{"breath; tone"}	\N	\N	\N
@@ -2346,7 +2376,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 石垣	いしがき	{石壁}	{"stone [rock] wall [fence]"}	\N	\N	\N
 意識	いしき	{心が知覚を有しているときの状態。「ーを取り戻す」}	{consciousness;}	\N	\N	\N
 碑	いしぶみ	{}	{"stone monument bearing an inscription"}	\N	\N	\N
-苛める	いじめる	{}	{"to tease; to torment; to persecute; to chastise"}	\N	\N	\N
 医者	いしゃ	{}	{"doctor (medical)"}	\N	\N	\N
 移住	いじゅう	{}	{"migration; immigration"}	\N	\N	\N
 萎縮	いしゅく	{しぼんでちぢむこと。また、元気がなくなること。「寒くて手足が―する」「聴衆を前にして―してしまう」}	{"〔しなびて縮むこと〕withering; 〔栄養不良などによる〕atrophy"}	\N	\N	\N
@@ -2429,7 +2458,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 一挙に	いっきょに	{}	{"at a stroke; with a single swoop"}	\N	\N	\N
 慈しみ	いつくしみ	{}	{affection}	\N	\N	\N
 一刻	いっこく	{わずかな時間。瞬時。「―を争う」「―も早く」}	{"〔わずかな時間〕a moment"}	\N	\N	\N
-一切	いっさい	{}	{"all; everything; without exception; the whole; entirely; absolutely"}	\N	\N	\N
 一種	いっしゅ	{}	{"species; kind; variety"}	\N	\N	\N
 一瞬	いっしゅん	{}	{"moment; instant"}	\N	\N	\N
 一緒	いっしょ	{}	{"together; meeting; company"}	\N	\N	\N
@@ -2450,7 +2478,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 一個	いっこ	{}	{"1 piece (article)"}	\N	\N	\N
 一日	いちにち	{}	{"first of month"}	\N	\N	\N
 一刻者	いっこくもの	{頑固で自分を曲げない人。一徹者。}	{"「an obstinate [a stubborn] person"}	\N	{一国者}	\N
-一体	いったい	{一つのからだ。また、同一のからだのようになっていること。同体。「―を成す」「夫婦は―」「三位 (さんみ) ―」,全体にならしていうさま。総じて。概して。「―に今年は雪が多い」「日本人は―に表情に乏しい」,強い疑問や、とがめる意を表す。そもそも。「―君は何者だ」}	{"〔一団〕a [one] body; 〔統一体〕(a) unity","〔「一体に」の形で，全般に〕⇒がいして(概して)in general","〔強い疑問〕what on earth (bothers you); why the hell (didn't you come)⇒いったいぜんたい(一体全体)"}	\N	\N	\N
 何時でも	いつでも	{}	{"(at) any time; always; at all times; never (neg); whenever"}	\N	\N	\N
 何時の間に	いつのまに	{いつ。いつかわからないうちに。「ー仕上げたのだろう」}	{"all too soon; without our noticing it; before (we) know it; not sure since when"}	\N	\N	\N
 一敗	いっぱい	{}	{"one defeat"}	\N	\N	\N
@@ -2537,7 +2564,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 印刷	いんさつ	{}	{printing}	\N	\N	\N
 印象	いんしょう	{}	{impression}	\N	\N	\N
 引退	いんたい	{役職や地位から身を退くこと。スポーツなどで現役から退くこと。「ー興行」}	{retire}	\N	\N	\N
-隠蔽	いんぺい	{人の所在、事の真相などを故意に覆い隠すこと。「証拠をーする」「ー工作」}	{"hiding; concealment"}	\N	\N	\N
 引用	いんよう	{}	{"quotation; citation"}	\N	\N	\N
 淫乱	いんらん	{色欲をほしいままにしてみだらなこと。また、そのさま。「―な性向」}	{"excessive indulgence in sex; alcohol; or drugs; debauchery; lechery; lasciviousness;"}	\N	\N	\N
 飲料	いんりょう	{飲むためのもの。飲み物。「清涼―」「―水」}	{"a drink; a beverage"}	\N	\N	\N
@@ -2558,6 +2584,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 字	じ	{}	{character}	\N	\N	\N
 地方	じかた	{}	{"area; locality; district; region; the coast"}	\N	\N	\N
 入れる	いれる	{"",湯を差して、茶などを出す。「コーヒーを―・れる」}	{"put in; take in; bring in; let in; admit; introduce; usher in; insert; employ; listen to; tolerate; comprehend; include; pay (interest); cast (votes)","〔茶やコーヒーを〕make (coffee/tea)"}	\N	\N	\N
+隠蔽	いんぺい	{人の所在、事の真相などを故意に覆い隠すこと。隠匿。秘匿。隠し立て。「証拠をーする」「ー工作」}	{"hiding; concealment"}	{名,スル}	\N	\N
 時間帯	じかんたい	{1日のうちの、ある時刻とある時刻との間の一定の時間}	{"time zone"}	\N	\N	\N
 時間割	じかんわり	{}	{"timetable; schedule"}	\N	\N	\N
 直	じき	{}	{"direct; in person; soon; at once; just; near by; honesty; frankness; simplicity; cheerfulness; correctness"}	\N	\N	\N
@@ -2617,7 +2644,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 実績	じっせき	{}	{"achievements; actual results"}	\N	\N	\N
 実践	じっせん	{}	{"practice; put into practice"}	\N	\N	\N
 実線	じっせん	{幾何や製図などで、切れ目なく連続して引かれる線。}	{"a solid line"}	\N	\N	\N
-実態	じったい	{}	{"truth; fact"}	\N	\N	\N
 実に	じつに	{}	{"indeed; truly; surely"}	\N	\N	\N
 実は	じつは	{}	{"as a matter of fact; by the way"}	\N	\N	\N
 実費	じっぴ	{}	{"actual expense; cost price"}	\N	\N	\N
@@ -2738,11 +2764,9 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 定規	じょうぎ	{}	{"(measuring) ruler"}	\N	\N	\N
 上級	じょうきゅう	{}	{"advanced level; high grade; senior"}	\N	\N	\N
 上京	じょうきょう	{}	{"proceeding to the capital (Tokyo)"}	\N	\N	\N
-状況	じょうきょう	{移り変わる物事の、その時々のありさま；状態；環境；}	{"situation; circumstances"}	\N	\N	\N
 上空	じょうくう	{}	{"sky; the skies; high-altitude sky; upper air"}	\N	\N	\N
 条件	じょうけん	{}	{"conditions; terms"}	\N	\N	\N
 上司	じょうし	{}	{"superior authorities; boss"}	\N	\N	\N
-常識	じょうしき	{}	{"common sense"}	\N	\N	\N
 乗車	じょうしゃ	{}	{"taking a train"}	\N	\N	\N
 乗車券	じょうしゃけん	{}	{"a (railway; streetcar) ticket; 割引乗車券a discount ticket"}	\N	\N	\N
 上旬	じょうじゅん	{月の1日から10日までの10日間。初旬}	{"first 10 days of month"}	\N	\N	\N
@@ -2774,6 +2798,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 乗客	じょうきゃく	{}	{passenger}	\N	\N	\N
 上手	じょうず	{物事のやり方が巧みで、手際のよいこと。また、そのさまやその人。「字を―に書く」「テニスの―な人」「時間の使い方が―だ」「聞き―」「三国一の舞いの―」⇔下手 (へた) 。}	{"skill; skillful; dexterity"}	\N	\N	\N
 条約	じょうやく	{国家間または国家と国際機関との間の文書による合意。協定。}	{"a treaty; a pact"}	\N	\N	\N
+状況	じょうきょう	{移り変わる物事の、その時々のありさま。状態。環境。}	{"situation; circumstances"}	\N	\N	\N
+常識	じょうしき	{一般の社会人が共通にもつ、またもつべき普通の知識・意見や判断力。知識。良識。「―がない人」「―で考えればわかる」「―に欠けた振る舞い」「―外れ」}	{"〔思慮分別〕common sense〔周知のこと〕common knowledge"}	\N	\N	\N
 助言	じょげん	{}	{"advice; suggestion"}	\N	\N	\N
 徐行	じょこう	{}	{"going slowly"}	\N	\N	\N
 女史	じょし	{}	{Ms.}	\N	\N	\N
@@ -2917,7 +2943,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 顔付き	かおつき	{}	{"(outward) looks; features; face; countenance; expression"}	\N	\N	\N
 課外	かがい	{}	{extracurricular}	\N	\N	\N
 抱える	かかえる	{}	{"hold or carry under or in the arms"}	\N	\N	\N
-価格	かかく	{}	{"price; value; cost"}	\N	\N	\N
 化学	かがく	{}	{chemistry}	\N	\N	\N
 科学	かがく	{}	{science}	\N	\N	\N
 掲げる	かかげる	{}	{"to publish; to print; to carry (an article); to put up; to hang out; to hoist; to fly (a sail); to float (a flag)"}	\N	\N	\N
@@ -2935,6 +2960,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 書き取り	かきとり	{}	{dictation}	\N	\N	\N
 香る	かおる	{よいにおいがする。芳香を放つ。「梅が―・る」}	{"be fragrant; smell well"}	\N	{薫る}	\N
 代える	かえる	{}	{"to exchange; to interchange; to substitute; to replace"}	\N	{換える,替える}	\N
+価格	かかく	{商品の価値を貨幣で表したもの。値段。}	{"〔売り手が要求する〕(a) price; 〔代価・原価としての〕(a) cost; 〔価値〕(a) value"}	\N	\N	\N
 介入	かいにゅう	{当事者以外の者が入り込むこと。争いやもめごとなどの間に入って干渉すること。「国際紛争に―する」}	{"intervention 〜する intervene ((in; between)); 〔お節介で〕meddle ((in; with))"}	\N	\N	\N
 書き取る	かきとる	{}	{"to write down; to take dictation; to take notes"}	\N	\N	\N
 垣根	かきね	{}	{hedge}	\N	\N	\N
@@ -2997,7 +3023,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 駆けっこ	かけっこ	{}	{"(foot) race"}	\N	\N	\N
 欠片	かけら	{物の欠けた一片。断片。「せんべいの―」}	{"〔欠けた一片〕a fragment; a broken piece"}	\N	\N	\N
 欠ける	かける	{}	{"be lacking"}	\N	\N	\N
-掛ける	かける	{}	{"wear; put on; hang; cover; sit down; make a phone call; multiply; turn on (a switch); play (a record); begin to"}	\N	\N	\N
 賭ける	かける	{}	{"to wager; to bet; to risk; to stake; to gamble"}	\N	\N	\N
 駆ける	かける	{}	{"to run (race esp. horse); to gallop; to canter"}	\N	\N	\N
 加減	かげん	{}	{"addition and subtraction; degree; extent; measure; chance"}	\N	\N	\N
@@ -3100,7 +3125,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 活字	かつじ	{}	{"printing type"}	\N	\N	\N
 褐色	かっしょく	{}	{brown}	\N	\N	\N
 曽て	かつて	{過去のある一時期を表す語。以前。昔。}	{"once; formerly"}	\N	\N	\N
-勝手	かって	{他人のことはかまわないで、自分だけに都合がよいように振る舞うこと。「そんな-は許さない」}	{"selfishness; own convenience"}	\N	\N	\N
 葛藤	かっとう	{人と人が互いに譲らず対立し、いがみ合うこと。「親子の―」}	{"(a) conflict ((between)); trouble; difficulties; complications"}	\N	\N	\N
 活動	かつどう	{}	{"action; activity"}	\N	\N	\N
 活発	かっぱつ	{}	{"vigor; active"}	\N	\N	\N
@@ -3112,8 +3136,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 方	かた	{}	{"polite way of indicating person"}	\N	\N	\N
 敵	かたき	{}	{"enemy; rival"}	\N	\N	\N
 勝つ	かつ	{}	{"〔勝利を得る〕win; 〔負かす〕defeat; beat",〔勝る〕surpass;}	\N	\N	\N
+勝手	かって	{"1 他人のことはかまわないで、自分だけに都合がよいように振る舞うこと。「そんな-は許さない」",台所。キッチン。「―仕事」}	{"selfishness; own convenience",kitchen}	\N	\N	\N
 仮定	かてい	{}	{"assumption; supposition; hypothesis"}	\N	\N	\N
-家庭	かてい	{}	{"home; family; household"}	\N	\N	\N
 課程	かてい	{}	{"course; curriculum"}	\N	\N	\N
 過程	かてい	{}	{"a process"}	\N	\N	\N
 仮名	かな	{}	{"kana; alias; pseudonym; pen name"}	\N	\N	\N
@@ -3169,6 +3193,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 哀しい	かなしい	{心が痛んで泣けてくるような気持ちである。嘆いても嘆ききれぬ気持ちだ。「友が死んで―・い」⇔うれしい。}	{"sad; miserable; ((やや文)) sorrowful"}	\N	{悲しい}	\N
 家内	かない	{妻。ふつう、他人に対して自分の妻をいうときに用いる。ワイフ。「―も喜んでおります」}	{"(my) wife"}	\N	\N	\N
 必ず	かならず	{確実な推量、または強い意志・要請を表す。まちがいなく。絶対に。きっと。「いつかそういう日が―来る」「―勝ってみせる」「印鑑を―持参すること」「―成功するとは限らない」,例外のないさま。きまって。いつでも。「毎朝―散歩する」「会えば―論争になる」}	{"〔間違いなく〕certainly; surely",〔いつも〕always}	\N	\N	\N
+家庭	かてい	{夫婦・親子などの関係にある者が生活をともにする、小さな集団。また、その生活する所。家。ホーム。「明るい―を作る」}	{"a home; a family〔世帯〕a household"}	\N	\N	\N
 科目	かもく	{}	{"(school) subject; curriculum; course"}	\N	\N	\N
 かも知れない	かもしれない	{断定はできないが、その可能性があることを表す。「あの建物は学校ーない」}	{"may; perhaps; might"}	\N	\N	\N
 貨物	かもつ	{}	{"cargo; freight; money or assets"}	\N	\N	\N
@@ -3210,7 +3235,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 代わり	かわり	{}	{"instead of"}	\N	\N	\N
 代わる	かわる	{}	{"to take the place of; to relieve; to be substituted for; to be exchanged; to change places with; to take turns; to be replaced"}	\N	\N	\N
 代る	かわる	{}	{"take the place of; relieve; be substituted for; be exchanged; change places with; take turns; be replaced"}	\N	\N	\N
-変わる	かわる	{}	{change}	\N	\N	\N
 代わる代わる	かわるがわる	{}	{alternately}	\N	\N	\N
 観	かん	{}	{"look; appearance; spectacle"}	\N	\N	\N
 幹	かん	{}	{"(tree) trunk"}	\N	\N	\N
@@ -3342,7 +3366,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 敬具	けいぐ	{}	{"Sincerely yours"}	\N	\N	\N
 経験	けいけん	{実際に見たり、聞いたり、行ったりすること。また、それによって得られた知識や技能など。「―を積む」「―が浅い」「いろいろな部署を―する」}	{experience}	\N	\N	\N
 軽減	けいげん	{}	{abatement}	\N	\N	\N
-稽古	けいこ	{}	{"practice; training; study"}	\N	\N	\N
 敬語	けいご	{}	{"honorific; term of respect"}	\N	\N	\N
 傾向	けいこう	{}	{"tendency; trend; inclination"}	\N	\N	\N
 蛍光灯	けいこうとう	{}	{"fluorescent lamp; person who is slow to react"}	\N	\N	\N
@@ -3399,6 +3422,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 欠陥	けっかん	{}	{"defect; fault; deficiency"}	\N	\N	\N
 汚す	けがす	{}	{"to disgrace; to dishonour"}	\N	\N	\N
 汚れる	けがれる	{}	{"to get dirty; to become dirty"}	\N	\N	\N
+稽古	けいこ	{芸能・武術・技術などを習うこと。また、練習。訓練。「―に励む」「―をつける」「毎日―して上達する」}	{"practice; training; study"}	{名,スル}	\N	\N
 血管	けっかん	{}	{"blood vessel"}	\N	\N	\N
 決議	けつぎ	{}	{"resolution; vote; decision"}	\N	\N	\N
 結局	けっきょく	{}	{"after all; eventually"}	\N	\N	\N
@@ -3508,7 +3532,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 生	き	{}	{"pure; undiluted; raw; crude"}	\N	\N	\N
 黄色	きいろ	{}	{"the color yellow (noun)"}	\N	\N	\N
 帰京	ききょう	{}	{"returning to Tokyo"}	\N	\N	\N
-企業	きぎょう	{}	{"enterprise; undertaking"}	\N	\N	\N
 起業家	きぎょうか	{新しく事業をおこして運営する人}	{"entrepreneur (business-starting-guy)"}	\N	\N	\N
 基金	ききん	{}	{"fund; foundation"}	\N	\N	\N
 飢饉	ききん	{}	{famine}	\N	\N	\N
@@ -3923,7 +3946,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 高度	こうど	{}	{"altitude; height; advanced"}	\N	\N	\N
 口頭	こうとう	{}	{oral}	\N	\N	\N
 高等	こうとう	{}	{"high class; high grade"}	\N	\N	\N
-高騰	こうとう	{}	{inflation}	\N	\N	\N
 講堂	こうどう	{}	{"lecture hall"}	\N	\N	\N
 行動	こうどう	{}	{"action; conduct; behaviour; mobilization"}	\N	\N	\N
 高等学校	こうとうがっこう	{}	{"senior high school"}	\N	\N	\N
@@ -4024,7 +4046,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 腰掛ける	こしかける	{}	{"sit (down)"}	\N	\N	\N
 乞食	こじき	{}	{beggar}	\N	\N	\N
 故障	こしょう	{}	{breakdown}	\N	\N	\N
-故人	こじん	{}	{"the deceased; old friend"}	\N	\N	\N
 個人	こじん	{}	{"individual; personal; private"}	\N	\N	\N
 超す	こす	{}	{"cross; pass; tide over"}	\N	\N	\N
 梢	こずえ	{}	{treetop}	\N	\N	\N
@@ -4061,6 +4082,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 骨	こつ	{}	{"knack; skill"}	\N	\N	\N
 骨格	こっかく	{}	{"〔骨組み〕a framework; 〔動物学上の〕a skeleton; 〔体付き〕a build"}	\N	{骨骼}	\N
 心当たり	こころあたり	{心に思い当たること。また、見当をつけた場所。「就職口なら―がある」「―を探してみる」}	{"having some knowledge of; happening to know; 〜がある have in mind; know of"}	\N	\N	\N
+故人	こじん	{死んだ人。死者。死人。「―を弔う」「―となる」}	{"the deceased; old friend; the departed〔亡くなった人たち〕the dead"}	\N	\N	\N
 事柄	ことがら	{物事の内容・ようす。また、物事そのもの。「調べた―を発表する」「新企画に関する極秘の―」「重大な―」}	{"matter; thing; affair; circumstance"}	\N	\N	\N
 孤独	こどく	{}	{"isolation; loneliness; solitude"}	\N	\N	\N
 今年	ことし	{}	{"this year"}	\N	\N	\N
@@ -4069,7 +4091,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 異なる	ことなる	{}	{"differ; vary; disagree"}	\N	\N	\N
 殊に	ことに	{}	{"especially; above all"}	\N	\N	\N
 事によると	ことによると	{}	{"depending on the circumstances"}	\N	\N	\N
-言葉	ことば	{人が声に出して言ったり文字に書いて表したりする、意味のある表現。言うこと。「友人の―を信じる」}	{"word(s); phrase; language; speech"}	\N	\N	\N
 言葉遣い	ことばづかい	{}	{"speech; expression; wording"}	\N	\N	\N
 子供	こども	{}	{"children; kids"}	\N	\N	\N
 小鳥	ことり	{}	{"(small) bird"}	\N	\N	\N
@@ -4143,7 +4164,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 区域	くいき	{}	{"limits; boundary; domain; zone; sphere; territory"}	\N	\N	\N
 食い違う	くいちがう	{}	{"to cross each other; to run counter to; to differ; to clash; to go awry"}	\N	\N	\N
 悔いる	くいる	{}	{regret}	\N	\N	\N
-食う	くう	{}	{eat}	\N	\N	\N
 空気	くうき	{}	{air}	\N	\N	\N
 空港	くうこう	{}	{"air port"}	\N	\N	\N
 空想	くうそう	{}	{"daydream; fantasy; fancy; vision"}	\N	\N	\N
@@ -4172,6 +4192,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 金色	こんじき	{黄金の色。きんいろ。}	{"golden; golden-colored"}	\N	\N	\N
 今日	こんにち	{}	{today}	\N	\N	\N
 懇々	こんこん	{}	{earnestly}	\N	{懇懇}	\N
+食う	くう	{}	{"（食べる）eat; have"}	\N	\N	\N
 崩す	くずす	{}	{"destroy; pull down; make change (money)"}	\N	\N	\N
 薬	くすり	{}	{medicine}	\N	\N	\N
 薬指	くすりゆび	{}	{"ring finger"}	\N	\N	\N
@@ -4350,7 +4371,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 全く	まったく	{完全にその状態になっているさま。すっかり。決して。全然。「―新しい企画」「回復の希望は―絶たれた」}	{"really; truly; entirely; completely; wholly; perfectly; indeed"}	\N	\N	\N
 抹茶	まっちゃ	{}	{matcha}	\N	\N	\N
 真っ二つ	まっぷたつ	{}	{"in two equal parts"}	\N	\N	\N
-祭	まつり	{}	{"festival; feast"}	\N	\N	\N
 祭る	まつる	{}	{"deify; enshrine"}	\N	\N	\N
 祀る	まつる	{儀式をととのえて神霊をなぐさめ、また、祈願する。「先祖のみ霊 (たま) を―・る」「死者を―・る」}	{worship}	\N	\N	\N
 窓	まど	{}	{window}	\N	\N	\N
@@ -4361,7 +4381,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 間に合う	まにあう	{}	{"to be in time (for)"}	\N	\N	\N
 免れる	まぬかれる	{}	{"to escape from; to be rescued from; to avoid; to evade; to avert; to elude; to be exempted; to be relieved from pain; to get rid of"}	\N	\N	\N
 招き	まねき	{}	{invitation}	\N	\N	\N
-招く	まねく	{}	{invite}	\N	\N	\N
 真似る	まねる	{}	{"mimic; imitate"}	\N	\N	\N
 疎ら	まばら	{物が少なくて、間がすいているさま。すきまのあいているさま。「人通りも―な住宅街」}	{sparse}	\N	\N	\N
 麻痺	まひ	{}	{"paralysis; palsy; numbness; stupor"}	\N	\N	\N
@@ -4385,6 +4404,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 真似	まね	{}	{"mimicry; imitation; behavior; pretense"}	\N	{マネ}	\N
 丸々	まるまる	{}	{completely}	\N	{丸丸}	\N
 区々	まちまち	{}	{"several; various; divergent; conflicting; different; diverse; trivial"}	\N	{区区}	\N
+祭	まつり	{}	{"festival; feast"}	\N	{祭り}	\N
 丸める	まるめる	{}	{"to make round; to round off; to roll up; to curl up; to seduce; to cajole; to explain away"}	\N	\N	\N
 回す	まわす	{}	{"turn; revolve"}	\N	\N	\N
 周り	まわり	{}	{surroundings}	\N	\N	\N
@@ -4488,7 +4508,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 味覚	みかく	{}	{"taste; palate; sense of taste"}	\N	\N	\N
 磨く	みがく	{}	{"to polish; shine; brush; refine; improve"}	\N	\N	\N
 見掛け	みかけ	{}	{"outward appearance"}	\N	\N	\N
-見掛ける	みかける	{}	{"to (happen to) see; to notice; to catch sight of"}	\N	\N	\N
 見方	みかた	{}	{viewpoint}	\N	\N	\N
 熱	ねつ	{}	{"heat; fever"}	\N	\N	\N
 三	み	{}	{"(num) three"}	\N	\N	\N
@@ -4723,7 +4742,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 報う	むくう	{}	{"to reward / recompensate / repay (むch くうstomers is * by having good service)"}	\N	\N	\N
 無口	むくち	{}	{reticence}	\N	\N	\N
 向け	むけ	{}	{"for ~; oriented towards ~"}	\N	\N	\N
-向ける	むける	{}	{"turn towards; point"}	\N	\N	\N
 無限	むげん	{}	{infinite}	\N	\N	\N
 婿	むこ	{}	{son-in-law}	\N	\N	\N
 無効	むこう	{}	{"invalid; no effect; unavailable"}	\N	\N	\N
@@ -4762,6 +4780,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 無念	むねん	{}	{"chagrin; regret"}	\N	\N	\N
 六	む	{}	{"(num) six"}	\N	\N	\N
 向こう	むこう	{}	{"beyond; opposite direction; the other party","over there"}	\N	\N	\N
+向ける	むける	{その方向に正面が位置するようにする。ある方向を向かせる。「視線を―・ける」「背を―・ける」「マイクを―・ける」「怒りを他人に―・ける」}	{"〔向かせる〕turn towards; point (your gun); head (for)"}	\N	\N	\N
 無能	むのう	{}	{"inefficiency; incompetence"}	\N	\N	\N
 謀反	むほん	{時の為政者に反逆すること。国家・朝廷・君主にそむいて兵を挙げること。律の八虐の規定では国家に対する反逆をいい、「謀叛」の字を用い、謀反 (むへん) 、謀大逆 (ぼうたいぎゃく) に次いで3番目の重罪とされる。}	{rebellion}	\N	\N	\N
 無闇に	むやみに	{}	{"unreasonably; absurdly; recklessly; indiscreetly; at random"}	\N	\N	\N
@@ -4769,7 +4788,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 村	むら	{}	{village}	\N	\N	\N
 群がる	むらがる	{}	{"to swarm; to gather"}	\N	\N	\N
 紫	むらさき	{}	{"purple; violet (color)"}	\N	\N	\N
-無理	むり	{}	{compulsion}	\N	\N	\N
 無料	むりょう	{}	{"free; no charge"}	\N	\N	\N
 群れ	むれ	{}	{"group; crowd; flock; herd; bevy; school; swarm; cluster (of stars); clump"}	\N	\N	\N
 無論	むろん	{}	{"of course; naturally"}	\N	\N	\N
@@ -4800,10 +4818,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 中程	なかほど	{}	{"middle; midway"}	\N	\N	\N
 仲間	なかま	{}	{"company; fellow; colleague; associate; comrade; mate; group; circle of friends; partner"}	\N	\N	\N
 眺め	ながめ	{}	{"scene; view; prospect; outlook"}	\N	\N	\N
-眺める	ながめる	{}	{"view; gaze at"}	\N	\N	\N
 仲良し	なかよし	{}	{"intimate friend; close friend"}	\N	\N	\N
 ながら	ながら	{二つの動作・状態が並行して行われる意を表す。「ラジオを聞きー勉強する」}	{"as; while; although"}	\N	\N	\N
-流れ	ながれ	{}	{"stream; current"}	\N	\N	\N
 流れる	ながれる	{}	{"stream; flow; be washed away; run (ink)"}	\N	\N	\N
 亡き後	なきあと	{}	{"after the passing"}	\N	\N	\N
 泣く	なく	{}	{cry}	\N	\N	\N
@@ -4819,6 +4835,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 中身	なかみ	{}	{"contents; interior; substance; filling; (sword) blade"}	\N	{中味}	\N
 中々	なかなか	{}	{"very; considerably; easily; readily; by no means (neg); fairly; quite; highly; rather"}	\N	{中中}	\N
 流す	ながす	{"1 液体が流れるようにする。「トイレの水を―・す」「シャワーで汗を―・す」",物を動かして移らせる。「ムード音楽を―・す」「情報を―・す」}	{"drain; float; shed (blood; tears)","〔広める〕spread (a rumor); broadcast"}	\N	\N	\N
+無理	むり	{実現するのが難しいこと。行い難いこと。また、そのさま。「―を承知で、引き受ける」「―な要求をする」}	{"〔不可能〕too much; impossible"}	\N	\N	\N
 嘆く	なげく	{}	{"to sigh; to lament; to grieve"}	\N	\N	\N
 投げ出す	なげだす	{}	{"to throw down; to abandon; to sacrifice; to throw out"}	\N	\N	\N
 投げる	なげる	{}	{throw}	\N	\N	\N
@@ -4841,7 +4858,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 懐かしい	なつかしい	{}	{"dear; desired; missed"}	\N	\N	\N
 懐く	なつく	{}	{"to become emotionally attached"}	\N	\N	\N
 名付ける	なづける	{}	{"to name (someone)"}	\N	\N	\N
-納得	なっとく	{}	{"consent; assent; understanding; agreement; comprehension; grasp"}	\N	\N	\N
 夏休み	なつやすみ	{}	{"summer vacation; summer holiday"}	\N	\N	\N
 七歳	ななさい	{}	{"7-years old"}	\N	\N	\N
 七つ	ななつ	{}	{seven}	\N	\N	\N
@@ -4868,7 +4884,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 浪	なみ	{風や震動によって起こる海や川の水面の高低運動。波浪。「ーが寄せてくる」「ーが砕ける」「逆巻くー」}	{waves}	\N	\N	\N
 並み	なみ	{}	{"average; medium; common; ordinary"}	\N	\N	\N
 並木	なみき	{}	{"roadside tree; row of trees"}	\N	\N	\N
-涙	なみだ	{}	{tear}	\N	\N	\N
 滑らか	なめらか	{}	{"smoothness; glassiness"}	\N	\N	\N
 悩ましい	なやましい	{}	{"seductive; melancholy; languid"}	\N	\N	\N
 悩ます	なやます	{}	{"to afflict; to torment; to harass; to molest"}	\N	\N	\N
@@ -4877,6 +4892,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 七日	なのか	{}	{"seven days; the seventh day (of the month)"}	\N	\N	\N
 等	など	{一例を挙げ、あるいは、いくつか並べたものを総括して示し、それに限らず、ほかにも同種類のものがあるという意を表す。...なんか。「赤や黄―の落ち葉」「寒くなったのでこたつを出し―する」}	{"〔同類〕and so on; and [or] the like; 〔その他〕etc.〔たとえば...など〕such as; for example"}	\N	\N	\N
 何より	なにより	{抜きんでていること。それよりほかにないこと。副詞的にも用いる。「お目にかかれて―うれしい」「ここにいるのが―の証拠」,最上・最良であること。「贈り物として―の品」「お元気で―です」}	{"most (decisive evidence)",best}	\N	\N	\N
+涙	なみだ	{}	{tear}	\N	{涕}	\N
+納得	なっとく	{他人の考えや行動などを十分に理解して得心すること。得心。合点。「―のいかない話」「説明を聞いて―する」}	{"（同意）assent; consent（理解・了解）understanding"}	{名,スル}	\N	\N
 なら	なら	{}	{"Attach 「＿」 to the context in which the conditional would occur; [Assumed Context] + ＿ + [Result]; You must not attach the declarative 「だ」."}	\N	\N	\N
 習う	ならう	{}	{learn}	\N	\N	\N
 倣う	ならう	{}	{"imitate; follow; emulate"}	\N	\N	\N
@@ -4904,7 +4921,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 何だか	なんだか	{}	{"a little; somewhat; somehow"}	\N	\N	\N
 何て	なんて	{驚いたり、あきれたり、感心したりする気持ちを表す。なんという。->何と「ーだらしないんだ」「ーすばらしい絵だ」}	{"how...!; what...!"}	\N	\N	\N
 何で	なんで	{}	{"Why? What for?"}	\N	\N	\N
-何でも	なんでも	{}	{"by all means; everything"}	\N	\N	\N
 何と	なんと	{どんなふうに。どのように。驚いたり、あきれたり、感心したりする気持ちを表す。}	{"what; how; whatever"}	\N	\N	\N
 何となく	なんとなく	{}	{"somehow or other; for some reason or another"}	\N	\N	\N
 何とも	なんとも	{}	{"nothing (with neg. verb); quite; not a bit"}	\N	\N	\N
@@ -5051,7 +5067,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 忍者	にんじゃ	{}	{"a ninja; a Japanese secret agent in feudal times (with almost magical powers of stealth and concealment)"}	\N	\N	\N
 認証	にんしょう	{}	{authorization}	\N	\N	\N
 人情	にんじょう	{}	{"humanity; empathy; kindness; sympathy; human nature; common sense; customs and manners"}	\N	\N	\N
-妊娠	にんしん	{}	{"conception; pregnancy"}	\N	\N	\N
 忍耐	にんたい	{苦難などをこらえること。辛抱。我慢。「―のいる仕事」「食糧の不足を―する」}	{"〔耐え忍ぶこと〕patience; 〔耐久力〕endurance; 〔ねばり強さ〕perseverance"}	\N	\N	\N
 忍耐力	にんたいりょく	{つらいことや苦しみなどをたえしのぶ力。辛抱する力。がまん強さ}	{"perserverance; fortitude; staying power"}	\N	\N	\N
 妊婦	にんぷ	{}	{"pregnant woman"}	\N	\N	\N
@@ -5097,6 +5112,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 押し入れ	おしいれ	{}	{closet}	\N	\N	\N
 後	のち	{}	{"afterwards; since then; in the future"}	\N	\N	\N
 載せる	のせる	{}	{"to place on (something); to take on board; to give a ride; to let (one) take part; to impose on; to record; to mention; to load (luggage); to publish; to run (an ad)"}	\N	{乗せる}	\N
+妊娠	にんしん	{}	{"pregnancy〔受胎〕conception 〜する become pregnant; 〔医学，または文〕conceive"}	{名,スル}	\N	\N
 延びる	のびる	{}	{"to be prolonged"}	\N	\N	\N
 伸びる	のびる	{}	{"to stretch; to extend; to make progress; to grow (beard body height); to grow stale (soba); to lengthen; to spread; to be postponed; to be straightened; to be flattened; to be smoothed; to be exhausted"}	\N	\N	\N
 延べ	のべ	{}	{"futures; credit (buying); stretching; total"}	\N	\N	\N
@@ -5178,7 +5194,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 大げさ	おおげさ	{}	{"grandiose; exaggerated"}	\N	\N	\N
 大ざっぱ	おおざっぱ	{}	{"rough (as in not precise); broad; sketchy"}	\N	\N	\N
 大筋	おおすじ	{}	{"outline; summary"}	\N	\N	\N
-大勢	おおぜい	{}	{"many; a great number (of people)"}	\N	\N	\N
 大空	おおぞら	{}	{"heaven; firmament; the sky"}	\N	\N	\N
 大通り	おおどおり	{}	{"main street"}	\N	\N	\N
 大幅	おおはば	{普通より幅の広いこと。また、そのさま。⇔小幅。}	{"full width; large scale; drastic"}	\N	\N	\N
@@ -5195,7 +5210,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 侵す	おかす	{}	{"to invade; to raid; to trespass; to violate; to intrude on"}	\N	\N	\N
 犯す	おかす	{}	{"to commit; to perpetrate; to violate; to rape"}	\N	\N	\N
 お菜	おかず	{}	{"side dish; accompaniment for rice dishes"}	\N	\N	\N
-お金	おかね	{}	{money}	\N	\N	\N
 拝む	おがむ	{}	{"worship; beg"}	\N	\N	\N
 お代わり	おかわり	{}	{"second helping; another cup"}	\N	\N	\N
 沖	おき	{}	{"open sea"}	\N	\N	\N
@@ -5204,6 +5218,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 黄色	おうしょく	{}	{yellow}	\N	\N	\N
 大事	おおごと	{}	{"important; valuable; serious matter"}	\N	\N	\N
 丘	おか	{}	{hill}	\N	{岡}	\N
+大勢	おおぜい	{多くの人。多人数。副詞的にも用いる。多勢。大人数。「―の出席者」「―で見学する」⇔小勢 (こぜい) 。}	{"many; a great number (of people)"}	\N	\N	\N
+御金	おかね	{貨幣。金銭。また、財産。「―持ち」}	{money}	\N	{お金}	\N
 起き攻め	おきぜめ	{}	{"wake-up attack"}	\N	\N	\N
 お気遣いなく	おきづかいなく	{気をつかわないように相手に丁寧に述べる表現。気遣い無用。}	{"no worries!"}	\N	\N	\N
 翁	おきな	{}	{"an old man"}	\N	\N	\N
@@ -5256,7 +5272,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 押し込む	おしこむ	{}	{"to push into; to crowd into"}	\N	\N	\N
 惜しむ	おしむ	{}	{"to be frugal; to value; to regret"}	\N	\N	\N
 お邪魔します	おじゃまします	{}	{"Excuse me for disturbing (interrupting) you"}	\N	\N	\N
-お洒落	おしゃれ	{}	{"smartly dressed; someone smartly dressed; fashion-conscious"}	\N	\N	\N
 お嬢さん	おじょうさん	{}	{"daughter (polite)"}	\N	\N	\N
 押し寄せる	おしよせる	{}	{"to push aside; to advance on"}	\N	\N	\N
 雄	おす	{}	{"male (animal)"}	\N	\N	\N
@@ -5272,7 +5287,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 恐れ入る	おそれいる	{}	{"to be filled with awe; to feel small; to be amazed; to be surprised; to be disconcerted; to be sorry; to be grateful; to be defeated; to confess guilt"}	\N	\N	\N
 恐ろしい	おそろしい	{}	{"terrible; dreadful"}	\N	\N	\N
 教わる	おそわる	{}	{"be taught"}	\N	\N	\N
-お大事に	おだいじに	{}	{"Take care of yourself"}	\N	\N	\N
 お互い	おたがい	{相対する関係にある二者。双方、または、そのひとつひとつ。「お互い」の形でも用いる。「―の意思を尊重する」「―が譲り合う」}	{"mutual; reciprocal; each other"}	\N	\N	\N
 お宅	おたく	{}	{"your house (polite)"}	\N	\N	\N
 汚濁	おだく	{}	{"pollution; dirty; corruption. bribery"}	\N	\N	\N
@@ -5281,7 +5295,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 落ち込む	おちこむ	{}	{"to fall into; to feel down (sad)"}	\N	\N	\N
 落ち着き	おちつき	{}	{"calm; composure"}	\N	\N	\N
 陥る	おちいる	{望ましくない状態になる。よくない状態になる}	{"fall into (critical position/predicament);"}	\N	\N	\N
-落着く	おちつく	{}	{"calm down; settle in; be steady"}	\N	\N	\N
 落ち葉	おちば	{}	{"fallen leaves; leaf litter; defoliation; shedding leaves"}	\N	\N	\N
 落ちる	おちる	{}	{"fall; drop; come down"}	\N	\N	\N
 乙	おつ	{}	{"strange; quaint; stylish; chic; spicy; queer; witty; tasty; romantic; 2nd in rank; second sign of the Chinese calendar"}	\N	\N	\N
@@ -5301,16 +5314,17 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 お出掛け	おでかけ	{}	{"about to start out; just about to leave or go out"}	\N	{お出かけ}	\N
 お世辞	おせじ	{}	{"flattery; compliment"}	\N	{御世辞}	\N
 恐らく	おそらく	{}	{"probably; perhaps; maybe; possibly; （残念ながら…だ）I'm afraid ..."}	\N	\N	\N
+落着く	おちつく	{}	{"calm down; settle in; be steady"}	\N	{落ち着く}	\N
+お洒落	おしゃれ	{}	{"smartly dressed; someone smartly dressed; fashion-conscious"}	\N	{オシャレ}	\N
+御大事に	おだいじに	{相手の体をいたわる心持ちを表すあいさつの言葉。「どうぞ、―」}	{"Take care of yourself"}	\N	{お大事に}	\N
 お父さん	おとうさん	{}	{"(polite) father"}	\N	\N	\N
 弟神	おとうとがみ	{}	{"younger god brother"}	\N	\N	\N
-脅かす	おどかす	{}	{"to threaten; to coerce"}	\N	\N	\N
 男	おとこ	{}	{man}	\N	\N	\N
 男の子	おとこのこ	{}	{boy}	\N	\N	\N
 男の人	おとこのひと	{}	{man}	\N	\N	\N
 落し物	おとしもの	{}	{"lost property"}	\N	\N	\N
 落とす	おとす	{}	{"drop; let fall"}	\N	\N	\N
 訪れる	おとずれる	{}	{"to visit"}	\N	\N	\N
-脅す	おどす	{相手を恐れさせる。脅迫する。おどかす。}	{threaten}	\N	\N	\N
 大人	おとな	{}	{adult}	\N	\N	\N
 お供	おとも	{}	{"attendant; companion"}	\N	\N	\N
 踊り	おどり	{}	{dancing}	\N	\N	\N
@@ -5345,7 +5359,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 溺れる	おぼれる	{}	{"be drowned; indulge in"}	\N	\N	\N
 お参り	おまいり	{}	{"worship; shrine visit"}	\N	\N	\N
 御負け	おまけ	{}	{"a discount; a prize; something additional; bonus; an extra; an exaggeration"}	\N	\N	\N
-お祭り	おまつり	{}	{festival}	\N	\N	\N
 お巡りさん	おまわりさん	{}	{"policeman (friendly term)"}	\N	\N	\N
 お見舞い	おみまい	{}	{"asking after (a person´s health)"}	\N	\N	\N
 お宮	おみや	{}	{"Shinto shrine"}	\N	\N	\N
@@ -5355,6 +5368,9 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 一昨日	おととい	{}	{"day before yesterday"}	\N	\N	\N
 一昨年	おととし	{}	{"year before last"}	\N	\N	\N
 御任せ	おまかせ	{物事の判断や処理などを他人に任せること。特に、料理屋で料理の内容を店に一任すること。「―コース」「荷造りからすべて―でやってくれる引っ越しサービス」}	{"rely; leave it up to (e.g. the chef; washing machine)"}	\N	{お任せ}	\N
+御祭	おまつり	{}	{festival}	\N	{御祭り,お祭り,お祭}	\N
+脅す	おどす	{相手を恐れさせる。脅迫する。おどかす。}	{threaten}	\N	{威す,嚇す}	\N
+脅かす	おどかす	{"1 怖がらせる。脅迫する。おどす。「有り金全部置いていけと―・す」",びっくりさせる。驚かす。「隠れていて―・してやろう」}	{"（怖がらせる）terrify; threaten","〔びっくりさせる〕startle; frighten"}	\N	{嚇かす,威かす}	\N
 汚名	おめい	{}	{"stigma; dishonour; dishonor; infamy"}	\N	\N	\N
 お目出度う	おめでとう	{}	{"(ateji) (int) (uk) Congratulations!; an auspicious occasion!"}	\N	\N	\N
 お目に掛かる	おめにかかる	{}	{"to see or meet someone"}	\N	\N	\N
@@ -5364,7 +5380,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 思い切り	おもいきり	{あきらめ。満足できるまでするさま。思う存分。「―遊びたい」「―がいい」}	{"〔思う存分〕to one's heart's content; 〔力一杯〕to the best of one's ability; with all one's might"}	\N	\N	\N
 思い出す	おもいだす	{}	{"recall; remember"}	\N	\N	\N
 思い付き	おもいつき	{}	{"plan; idea; suggestion"}	\N	\N	\N
-思い付く	おもいつく	{}	{"think of; hit upon; come into one´s mind"}	\N	\N	\N
 思い出	おもいで	{}	{"memories; recollections; reminiscence"}	\N	\N	\N
 思う	おもう	{ある物事について考えをもつ。考える。}	{think}	\N	\N	\N
 想う	おもう	{眼前にない物事について、心を働かせる。想像する。「―・ったほどおもしろくない」「夢にも―・わなかった」}	{"think; conceptulize; make up ideas"}	\N	\N	\N
@@ -5406,6 +5421,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 表	おもて	{}	{"the front"}	\N	\N	\N
 重なる	おもなる	{}	{"main; principal; important"}	\N	\N	\N
 重役	おもやく	{}	{"heavy responsibilities; director"}	\N	\N	\N
+思い付く	おもいつく	{ある考えがふと心に浮かぶ。考えつく。「いいアイデアを―・く」}	{"to think up (an idea); think of; hit upon; come into one´s mind"}	\N	{思いつく}	\N
 お礼	おれい	{}	{courtesy}	\N	\N	\N
 折れる	おれる	{}	{"break; snap"}	\N	\N	\N
 愚か	おろか	{頭の働きが鈍いさま。考えが足りないさま。}	{"foolish; silly; stupid"}	\N	\N	\N
@@ -5460,7 +5476,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 乱取り	らんどおり	{柔道で、互いに自由に技をかけ合って練習すること。}	{"〔柔道で〕free exercises (in judo)"}	\N	\N	\N
 乱暴	らんぼう	{}	{"rude; violent; rough; lawless; unreasonable; reckless"}	\N	\N	\N
 濫用	らんよう	{}	{"abuse; misuse; misappropriation; using to excess"}	\N	\N	\N
-礼	れい	{}	{"expression of gratitude"}	\N	\N	\N
 例外	れいがい	{}	{exception}	\N	\N	\N
 礼儀	れいぎ	{}	{"manners; courtesy; etiquette"}	\N	\N	\N
 略奪	りゃくだつ	{}	{"pillage; plunder; looting; robbery"}	\N	\N	\N
@@ -5481,7 +5496,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 列車	れっしゃ	{}	{"train (ordinary)"}	\N	\N	\N
 列島	れっとう	{}	{"chain of islands"}	\N	\N	\N
 恋愛	れんあい	{特定の異性に特別の愛情を感じて恋い慕うこと。また、男女が互いにそのような感情をもつこと。「熱烈にーする」}	{love}	\N	\N	\N
-煉瓦	れんが	{}	{brick}	\N	\N	\N
 冷却	れいきゃく	{温度を下げること。また、温度が下がること。「機関をーする」「ー水」}	{"cooling; refrigeration"}	\N	\N	\N
 連休	れんきゅう	{}	{"consecutive holidays"}	\N	\N	\N
 錬金術	れんきんじゅつ	{}	{alchemy}	\N	\N	\N
@@ -5778,7 +5792,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 去る	さる	{}	{"leave; go away"}	\N	\N	\N
 沢	さわ	{浅く水がたまり、草が生えている湿地。}	{"a swamp"}	\N	\N	\N
 騒がしい	さわがしい	{}	{noisy}	\N	\N	\N
-騒ぎ	さわぎ	{}	{"uproar; disturbance"}	\N	\N	\N
 騒ぐ	さわぐ	{}	{"make a noise"}	\N	\N	\N
 爽やか	さわやか	{}	{"fresh; refreshing; invigorating; clear; fluent; eloquent"}	\N	\N	\N
 障る	さわる	{}	{"to hinder; to interfere with; to affect; to do one harm; to be harmful to"}	\N	\N	\N
@@ -5813,6 +5826,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 散歩	さんぽ	{}	{"walk; stroll"}	\N	\N	\N
 三	さん	{}	{three}	\N	\N	\N
 桟橋	さんきょう	{}	{"wharf; bridge; jetty; pier"}	\N	\N	\N
+騒ぎ	さわぎ	{人々が騒ぐような出来事。ごたごた。騒動。「―を起こす」「―になる」}	{"uproar; disturbance"}	\N	\N	\N
 山脈	さんみゃく	{}	{"mountain range"}	\N	\N	\N
 山林	さんりん	{}	{"mountain forest; mountains and forest"}	\N	\N	\N
 三塁	さんるい	{}	{"third base"}	\N	\N	\N
@@ -5959,7 +5973,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 説得	せっとく	{}	{persuasion}	\N	\N	\N
 切ない	せつない	{}	{"painful; trying; oppressive; suffocating"}	\N	\N	\N
 設備	せつび	{}	{"equipment; device; facilities; installation"}	\N	\N	\N
-説明	せつめい	{ある事柄が、よくわかるように述べること。「ーを求める」「科学ではーのつかない現象」「事情をーする」}	{explanation}	\N	\N	\N
 節約	せつやく	{}	{"economising; saving"}	\N	\N	\N
 設立	せつりつ	{}	{"establishment; foundation; institution"}	\N	\N	\N
 瀬戸物	せともの	{}	{"earthenware; crockery; china"}	\N	\N	\N
@@ -5997,6 +6010,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 扇子	せんす	{}	{"folding fan"}	\N	\N	\N
 潜水	せんすい	{}	{diving}	\N	\N	\N
 切腹	せっぷく	{}	{"ritual suicide"}	\N	\N	\N
+説明	せつめい	{ある事柄が、よくわかるように述べること。解説。論説。「ーを求める」「科学ではーのつかない現象」「事情をーする」}	{explanation}	{名,スル}	\N	\N
 専制	せんせい	{}	{"despotism; autocracy"}	\N	\N	\N
 先生	せんせい	{}	{"teacher; master; doctor"}	\N	\N	\N
 先々月	せんせんげつ	{}	{"month before last"}	\N	\N	\N
@@ -6060,7 +6074,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 仕掛ける	しかける	{}	{"to commence; to lay (mines); to set (traps); to wage (war); to challenge"}	\N	\N	\N
 然しながら	しかしながら	{}	{"nevertheless; however"}	\N	\N	\N
 如かず	しかず	{及ばない。かなわない。「百聞は一見に―◦ず」}	{"fall short; can not compete;"}	\N	\N	\N
-仕方	しかた	{}	{"method; way"}	\N	\N	\N
 仕方が無い	しかたがない	{どうすることもできない。ほかによい方法がない。やむを得ない。「ー・い。それでやるか」}	{"nothing to do about it; can not be avoided/helped;"}	\N	\N	\N
 四月	しがつ	{}	{April}	\N	\N	\N
 叱る	しかる	{}	{scold}	\N	\N	\N
@@ -6203,11 +6216,11 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 萎む	しぼむ	{}	{"to wither; to fade (away); to shrivel; to wilt"}	\N	\N	\N
 絞る	しぼる	{}	{"press; wring; squeeze"}	\N	\N	\N
 搾る	しぼる	{}	{"squeeze; press"}	\N	\N	\N
-資本	しほん	{}	{"funds; capital"}	\N	\N	\N
 島	しま	{}	{island}	\N	\N	\N
 仕舞	しまい	{}	{"end; termination; informal (Noh play)"}	\N	\N	\N
 死に掛かる	しにかかる	{まさに死のうとしている。もうすこしで死にそうである。「おぼれて―・った」}	{"moribund; (of a thing) in terminal decline; lacking vitality or vigour; (of a person) at the point of death."}	\N	{死に懸かる,死にかかる}	\N
 死に掛け	しにかけ	{もう少しで死にそうなこと。瀕死 (ひんし) 。「―のところを助けられる」}	{"the dying (of someone/thing)"}	\N	{死に懸け,死にかけ}	\N
+資本	しほん	{商売や事業をするのに必要な基金。もとで。資本金。資金。キャピタル。}	{"funds; capital"}	\N	\N	\N
 歯磨剤	しまざい	{歯磨きの際に使用される製品である。}	{"tooth paste"}	\N	\N	\N
 始末	しまつ	{}	{"management; dealing; settlement; cleaning up afterwards"}	\N	\N	\N
 閉まる	しまる	{}	{"to close; become closed"}	\N	\N	\N
@@ -6267,7 +6280,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 週	しゅう	{}	{week}	\N	\N	\N
 衆	しゅう	{}	{"masses; great number; the people"}	\N	\N	\N
 私有	しゆう	{}	{"private ownership"}	\N	\N	\N
-周囲	しゅうい	{もののまわり。ぐるり。また、周辺。}	{surroundings}	\N	\N	\N
 集会	しゅうかい	{}	{"meeting; assembly"}	\N	\N	\N
 収穫	しゅうかく	{}	{"harvest; crop; ingathering"}	\N	\N	\N
 収穫量	しゅうかくりょう	{}	{"harvested amount; crop quantity"}	\N	\N	\N
@@ -6335,7 +6347,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 主人公	しゅじんこう	{}	{"protagonist; main character; hero(ine) (of a story); head of household"}	\N	\N	\N
 主体	しゅたい	{}	{"subject; main constituent"}	\N	\N	\N
 主題	しゅだい	{}	{"subject; theme; motif"}	\N	\N	\N
-手段	しゅだん	{}	{"means; way; measure"}	\N	\N	\N
 主張	しゅちょう	{}	{"claim; request; insistence; assertion; advocacy; emphasis; contention; opinion; tenet"}	\N	\N	\N
 出演	しゅつえん	{}	{"performance; stage appearance"}	\N	\N	\N
 出勤	しゅっきん	{}	{"going to work; at work"}	\N	\N	\N
@@ -6388,7 +6399,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 消化	しょうか	{生体が体内で食物を吸収しやすい形に変化させること。また、その過程。多くの動物では消化管内で、消化器の運動（物理的消化）、消化液の作用（化学的消化）、腸内細菌の作用（生物学的消化）などによって行われる。「―のいい食べ物」「よくかまないと―に悪い」}	{〔食べ物の〕digestion}	\N	\N	\N
 紹介	しょうかい	{}	{introduce}	\N	\N	\N
 障害	しょうがい	{}	{"obstacle; impediment (fault); damage"}	\N	\N	\N
-昇格	しょうかく	{}	{promotion}	\N	\N	\N
 奨学金	しょうがくきん	{}	{scholarship}	\N	\N	\N
 小学生	しょうがくせい	{}	{"little school student"}	\N	\N	\N
 小学校	しょうがっこう	{}	{"primary school"}	\N	\N	\N
@@ -6403,7 +6413,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 賞金	しょうきん	{}	{"prize; monetary award"}	\N	\N	\N
 衝撃	しょうげき	{瞬間的に大きな力を物体に加えること。また、その力。「衝突時の―を吸収する」}	{"〔激しい打撃〕a shock; 〔衝突による〕an impact; crash"}	\N	\N	\N
 証券	しょうけん	{財産法上の権利・義務に関する記載のされた紙片。有価証券と証拠証券とがある。}	{"〔債務証書〕a bond; 〔株式証券〕a certificate; 〔為替手形など〕a bill; 〔公債，株券などの有価証券〕securities"}	\N	\N	\N
-証言	しょうげん	{}	{"evidence; testimony"}	\N	\N	\N
 正午	しょうご	{}	{"noon; mid-day"}	\N	\N	\N
 照合	しょうごう	{}	{"collation; comparison"}	\N	\N	\N
 昇降機	しょうこうき	{}	{lift}	\N	\N	\N
@@ -6415,6 +6424,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 詔書	しょうしょ	{}	{"decree; imperial edict"}	\N	\N	\N
 少々	しょうしょう	{}	{"just a minute; small quantity"}	\N	{少少}	\N
 証拠	しょうこ	{事実・真実を明らかにする根拠となるもの。証左。あかし。しるし。「―を残す」「動かぬ―」「論より―」}	{"evidence; proof"}	\N	\N	\N
+昇格	しょうかく	{格式や階級などが上がること。また、上げること。格上げ。昇進。昇任。栄進。「課から部に―する」⇔降格。}	{promotion}	{名,スル}	\N	\N
 生じる	しょうじる	{}	{"produce; yield; result from; arise; be generated"}	\N	\N	\N
 昇進	しょうしん	{}	{promotion}	\N	\N	\N
 精進	しょうじん	{}	{"devotion; diligence"}	\N	\N	\N
@@ -6605,7 +6615,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 審問	しんもん	{}	{"an inquiry ((into)); 〔聴問〕a hearing"}	\N	\N	\N
 深夜	しんや	{}	{"late at night"}	\N	\N	\N
 親友	しんゆう	{}	{"close friend"}	\N	\N	\N
-信用	しんよう	{}	{"confidence; dependence; credit; faith; reliance; belief; credence"}	\N	\N	\N
 信頼	しんらい	{}	{"reliance; trust; confidence"}	\N	\N	\N
 辛辣	しんらつ	{言うことや他に与える批評の、きわめて手きびしいさま。「―をきわめる」「―な風刺漫画」}	{"〜な acerbic; sharp; sarcastic; sardonic"}	\N	\N	\N
 真理	しんり	{}	{truth}	\N	\N	\N
@@ -6627,6 +6636,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 梅	うめ	{}	{"plum; plum-tree; lowest (of a three-tier ranking system)"}	{植物}	\N	\N
 荻	おぎ	{}	{reed}	{植物}	\N	\N
 柿	かき	{}	{"kaki; persimon"}	{植物}	\N	\N
+信用	しんよう	{"1 確かなものと信じて受け入れること。「相手の言葉を―する」",それまでの行為・業績などから、信頼できると判断すること。また、世間が与える、そのような評価。人望。名望。声望。信望。「―を得る」「―を失う」「―の置けない人物」「店の―に傷がつく」}	{"〔信頼〕confidence (in); trust (in); faith (in); reliance (on)",〔評判〕reputation〔取り引き相手の信用度〕credit}	{名,スル}	\N	\N
 添う	そう	{}	{"to accompany; to become married; to comply with"}	\N	\N	\N
 沿う	そう	{}	{"to run along; to follow"}	\N	\N	\N
 僧	そう	{}	{"monk; priest"}	\N	\N	\N
@@ -6853,7 +6863,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 筋	すじ	{筋肉。また、その線維。「肩の―が凝る」,皮膚の表面に浮き上がってみえる血管。「―の浮き出た手」「額に―を立てて怒る」,家系。家柄。「貴族の―を引く」,物事の道理。すじみち。「―の通った話」,小説や演劇などの、大体の内容。梗概 (こうがい) 。「芝居の―」}	{"〔筋肉の繊維〕(a) sinew; muscle; 〔腱〕a tendon","〔血管〕a vein⇒あおすじ(青筋)","〔血統〕((文)) (a) lineage","〔道理〕reason; logic","〔物語の〕a plot"}	\N	\N	\N
 棄てる	すてる	{不用のものとして、手元から放す。ほうる。投棄する。「ごみを―・てる」「武器を―・てて投降する」⇔拾う。}	{"throw away; cast aside; abandon; resign"}	\N	\N	\N
 砂	すな	{}	{sand}	\N	\N	\N
-素直	すなお	{}	{"obedient; meek; docile; unaffected"}	\N	\N	\N
 素早い	すばやい	{}	{"fast; quick; prompt; agile"}	\N	\N	\N
 素晴らしい	すばらしい	{}	{"wonderful; splendid; magnificent"}	\N	\N	\N
 全て	すべて	{}	{"all; the whole; entirely; in general; wholly"}	\N	\N	\N
@@ -6908,6 +6917,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 他	た	{}	{"other (especially people and abstract matters)"}	\N	\N	\N
 臑	すね	{膝 (ひざ) からくるぶしまでの間の部分。はぎ。}	{"〔向こうずね〕the shin"}	\N	{脛}	\N
 大金	たいきん	{多額の金銭。大きな金高 (きんだか) 。「―をはたく」}	{"a large sum of money"}	\N	\N	\N
+素直	すなお	{性質・態度などが、穏やかでひねくれていないさま。従順。柔順。「―な性格」「―に答える」}	{"〔穏やかな〕gentle; mild〔従順な〕obedient〔おとなしい〕meek"}	\N	\N	\N
 対策	たいさく	{相手の態度や事件の状況に対応するための方法・手段。「人手不足の―を立てる」「―を練る」「税金―」}	{"〔方策〕measures; a step; 〔対抗策〕a countermeasure"}	\N	\N	\N
 大使	たいし	{}	{ambassador}	\N	\N	\N
 退治	たいじ	{}	{extermination}	\N	\N	\N
@@ -7076,7 +7086,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 保つ	たもつ	{}	{"to keep; to preserve; to hold; to retain; to maintain; to support; to sustain; to last; to endure; to keep well (food); to wear well; to be durable"}	\N	\N	\N
 容易い	たやすい	{}	{"easy; simple; light"}	\N	\N	\N
 多様	たよう	{}	{"diversity; variety"}	\N	\N	\N
-便り	たより	{}	{"news; tidings; information; correspondence; letter"}	\N	\N	\N
 頼る	たよる	{}	{"rely on; have recourse to; depend on"}	\N	\N	\N
 足りる	たりる	{}	{"be sufficient; be enough"}	\N	\N	\N
 足る	たる	{}	{"be sufficient; be enough"}	\N	\N	\N
@@ -7113,6 +7122,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 偶に	たまに	{}	{"occasionally; once in a while; (treat) for a change"}	\N	\N	\N
 偶	たま	{まれであること。めったにないこと。また、そのさま。珍しい。「―の休み」「彼は―に来る」}	{"occasional; rare"}	\N	{適}	\N
 淡々	たんたん	{感じなどが、あっさりしているさま。淡泊なさま。「―たる色調」}	{"unconcerned; dispassion; indifferent; serene"}	\N	{淡淡,澹澹,澹々}	\N
+便り	たより	{何かについての情報。手紙。知らせ。「―が届く」「風の―に聞く」}	{"〔消息〕news ((of/about)); ((文)) tidings ((of)); 〔手紙〕a letter"}	\N	\N	\N
 単なる	たんなる	{それだけで、ほかに何も含まないさま。ただの。}	{"mere; simple"}	\N	\N	\N
 単に	たんに	{}	{"simply; merely; only; solely"}	\N	\N	\N
 堪能	たんのう	{技芸に優れていること}	{"be skilled/proficient (in)"}	\N	\N	\N
@@ -7158,12 +7168,12 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 停留所	ていりゅうじょ	{}	{"bus or tram stop"}	\N	\N	\N
 手入れ	ていれ	{}	{"repairs; maintenance"}	\N	\N	\N
 手遅れ	ておくれ	{}	{"too late; belated treatment"}	\N	\N	\N
-て居ります	て居ります	{「…ている」の丁寧な言い方。「ただ今、外出して―・ります」}	{"～ており is equivalent to ～ていて (which itself comes from ～ている; e.g. 書いている; 'currently writing')"}	\N	\N	\N
 手掛かり	てがかり	{}	{"contact; trail; scent; on hand; hand hold; clue; key"}	\N	\N	\N
 手掛ける	てがける	{}	{"to handle; to manage; to work with; to rear; to look after; to have experience with"}	\N	\N	\N
 手数	てかず	{}	{"number of moves; trouble"}	\N	\N	\N
 手紙	てがみ	{}	{letter}	\N	\N	\N
 手軽	てがる	{手数がかからず、簡単なさま。「―な食事」「―に扱えるカメラ」}	{"easy; simple; informal; offhand; cheap"}	\N	\N	\N
+て居ります	ております	{「…ている」の丁寧な言い方。「ただ今、外出して―・ります」}	{"～ており is equivalent to ～ていて (which itself comes from ～ている; e.g. 書いている; 'currently writing')"}	\N	\N	\N
 適応	てきおう	{}	{"adaptation; accommodation; conformity"}	\N	\N	\N
 適宜	てきぎ	{}	{suitability}	\N	\N	\N
 適する	てきする	{}	{"fit; suit"}	\N	\N	\N
@@ -7294,7 +7304,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 統率	とうそつ	{}	{"command; lead; generalship; leadership"}	\N	\N	\N
 灯台	とうだい	{}	{lighthouse}	\N	\N	\N
 到達	とうたつ	{}	{"reaching; attaining; arrival"}	\N	\N	\N
-到底	とうてい	{どうやってみても。どうしても。つまるところ。つまり。}	{"absolutely; most; utterly; simply; possibly"}	\N	\N	\N
 到着	とうちゃく	{目的地などに行きつくこと。到達。}	{arrival}	\N	\N	\N
 等々	とうとう	{}	{etc.}	\N	\N	\N
 党内	とうない	{政党の内部。仲間うち。}	{"inside party; intraparty; internal party (reasons)"}	\N	\N	\N
@@ -7319,7 +7328,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 討論	とうろん	{}	{"debate; discussion"}	\N	\N	\N
 遠い	とおい	{}	{"far; distant"}	\N	\N	\N
 十日	とおか	{}	{"ten days; the tenth day of the month"}	\N	\N	\N
-遠く	とおく	{}	{far}	\N	\N	\N
 遠ざかる	とおざかる	{}	{"to go far off"}	\N	\N	\N
 通す	とおす	{}	{"let pass; overlook; continue; keep; make way for; persist in"}	\N	\N	\N
 遠回り	とおまわり	{}	{"detour; roundabout way"}	\N	\N	\N
@@ -7339,6 +7347,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 奴	やつ	{}	{dude}	\N	\N	\N
 逃走	とうそう	{にげること。にげ去ること。遁走 (とんそう) 。「その場から―する」}	{"flight; desertion; escape"}	\N	\N	\N
 丁々	とうとう	{}	{"clashing of swords; felling of trees; ringing of an ax"}	\N	{丁丁}	\N
+遠く	とおく	{}	{"〔距離が離れている所〕far-off; distant"}	\N	\N	\N
+到底	とうてい	{"1 （あとに打消しの語を伴って）どうやってみても。どうしても。とても。「―相手にならない」「―できない」",つまるところ。つまり。「―人間として、生存する為には」}	{"at all; by no means; hardly（全く）quite; absolutely","to a full extent"}	\N	\N	\N
 説く	とく	{}	{"to explain; to advocate; to preach; to persuade"}	\N	\N	\N
 溶く	とく	{}	{"dissolve (e.g. paint)"}	\N	\N	\N
 研ぐ	とぐ	{}	{"to sharpen; to grind; to scour; to hone; to polish; to wash (rice)"}	\N	\N	\N
@@ -7458,7 +7468,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 取り立てる	とりたてる	{}	{"to collect; to extort; to appoint; to promote"}	\N	\N	\N
 取り次ぐ	とりつぐ	{}	{"to act as an agent for; to announce (someone); to convey (a message)"}	\N	\N	\N
 取り除く	とりのぞく	{}	{"to remove; to take away; to set apart"}	\N	\N	\N
-取り引き	とりひき	{}	{"transactions; dealings; business"}	\N	\N	\N
 取り巻く	とりまく	{}	{"to surround; to circle; to enclose"}	\N	\N	\N
 取り混ぜる	とりまぜる	{}	{"to mix; to put together"}	\N	\N	\N
 取り戻す	とりもどす	{}	{"to take back; to regain"}	\N	\N	\N
@@ -7470,7 +7479,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 撮る	とる	{}	{"take (a photo); make (a film)"}	\N	\N	\N
 捕る	とる	{}	{"take; catch (fish); capture"}	\N	\N	\N
 取れる	とれる	{}	{"come off; be taken off; be removed; be obtained; leave; come out (e.g. photo); be interpreted"}	\N	\N	\N
-繋がる	つながる	{一緒にする}	{"unite; be connected; be tied together"}	\N	\N	\N
 摘み	つまみ	{選び・取り}	{picked}	\N	\N	\N
 強者	つわもの	{強い者。他にまさる力や権力をもつ者。「―の論理」反：弱者。}	{"a strong man"}	\N	\N	\N
 強者揃い	つわものぞろい	{すごく強い}	{"incredibily skilled"}	\N	\N	\N
@@ -7479,19 +7487,20 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 追従	ついじゅう	{あとにつき従うこと}	{"complience; follow"}	\N	\N	\N
 追跡	ついせき	{}	{pursuit}	\N	\N	\N
 次いで	ついで	{}	{"next; secondly; subsequently"}	\N	\N	\N
-追悼	ついとう	{死者の生前をしのんで、悲しみにひたること。}	{mourning}	\N	\N	\N
 遂に	ついに	{長い時間ののちに、最終的にある結果に達するさま。とうとう。しまいに。「ー優勝を果たした」「ー完成した」「疲れ果ててー倒れた」}	{"finally; at last"}	\N	\N	\N
 追放	ついほう	{}	{"exile; banishment"}	\N	\N	\N
 費やす	ついやす	{}	{"to spend; to devote; to waste"}	\N	\N	\N
 墜落	ついらく	{}	{"falling; crashing"}	\N	\N	\N
 通	つう	{}	{"connoisseur; counter for letters"}	\N	\N	\N
 通貨	つうか	{}	{currency}	\N	\N	\N
-通過	つうか	{}	{"passage through; passing"}	\N	\N	\N
 通学	つうがく	{}	{"commuting to school"}	\N	\N	\N
 痛感	つうかん	{}	{"feeling keenly; fully realizing"}	\N	\N	\N
 通勤	つうきん	{}	{"commuting to work"}	\N	\N	\N
 一日	ついたち	{}	{"first day of month"}	\N	\N	\N
 取締まり	とりしまり	{不正や不法が行われないように監視すること。管理・監督すること。「管内の―にあたる」}	{"control; management; supervision"}	\N	{取り締まり}	\N
+通過	つうか	{}	{"〔通り過ぎること〕passage; transit; passage through; passing; 〜する pass (through)"}	\N	\N	\N
+繋がる	つながる	{離れているものが結ばれて、ひと続きになる。「島と島とが橋で―・がる」「電話が―・る」「光回線が―・る」}	{"（結ばれる）be connected; be linked together; be joined together"}	\N	\N	\N
+追悼	ついとう	{死者の生前をしのんで、悲しみにひたること。哀悼。哀惜。「―の辞」「故人を―する」}	{mourning}	{名,スル}	\N	\N
 通行	つうこう	{}	{"passage; passing"}	\N	\N	\N
 通称	つうしょう	{正式ではないが世間一般で呼ばれている名称。とおり名。鎌倉東慶寺を縁切り寺、徳川光圀を水戸黄門、歌舞伎「与話情浮名横櫛 (よわなさけうきなのよこぐし) 」を「切られ与三 (よさ) 」とよぶ類。}	{"a popular name"}	\N	\N	\N
 通常	つうじょう	{特別でなく、普通の状態であること。普通}	{"usual; normal; general"}	\N	\N	\N
@@ -7650,7 +7659,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 受け取る	うけとる	{}	{"to receive; to get; to accept; to take; to interpret; to understand"}	\N	\N	\N
 受身	うけみ	{}	{"passive; passive voice"}	\N	\N	\N
 受け持つ	うけもつ	{自分の仕事として引き受けて行う。担当する。担任する。「一年生を―・つ」「この地区の配達を―・つ」}	{"take (be in) charge of"}	\N	\N	\N
-受ける	うける	{}	{"have; take; receive"}	\N	\N	\N
 動かす	うごかす	{}	{"move; shift; set in motion; operate; inspire;; rouse; ;influence; mobilize; deny; change"}	\N	\N	\N
 潮	うしお	{}	{tide}	\N	\N	\N
 氏神	うじがみ	{神として祭られた氏族の先祖。藤原氏の天児屋命 (あまのこやねのみこと) 、斎部 (いんべ) 氏の天太玉命 (あまのふとだまのみこと) など。}	{"a tutelary [guardian/patron] deity; house god"}	\N	\N	\N
@@ -7671,6 +7679,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 後	うしろ	{}	{"afterwards; since then; in the future"}	\N	\N	\N
 受取人	うけとりにん	{金・書類・物品などを受け取る人。}	{"a recipient; 〔送金の〕a remittee; 〔手形の〕a payee; 〔保険の〕a beneficiary; 〔貨物の〕a consignee"}	\N	{受け取り人}	\N
 動き	うごき	{}	{"1〔動作・運動〕(a) movement; a move; (a) motion","2〔動向，移り変わり〕trend; changes; development;〔きざし〕signs; ","3〔行動〕activities; movements"}	\N	\N	\N
+受ける	うける	{自分の方に向かってくるものを、支え止めたり、取って収めたりする。受け止める。受け取る。「ミットでボールを―・ける」「雨水を桶 (おけ) に―・ける」}	{"〔受け取る，得る〕receive; get"}	\N	\N	\N
 謳う	うたう	{多くの人々が褒めたたえる。謳歌する。「太平の世を―・う」}	{"〔ほめたたえる〕sing the praises ((of)); ((文)) extol"}	\N	\N	\N
 詠う	うたう	{詩歌を作る。また、詩歌に節をつけて朗読する。「望郷の心を―・った詩」}	{"versify (a poem)?"}	\N	\N	\N
 疑い	うたがい	{}	{"doubt; distrust"}	\N	\N	\N
@@ -7733,7 +7742,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 裏口	うらぐち	{}	{"back door; rear entrance"}	\N	\N	\N
 占う	うらなう	{}	{"forecast; predict"}	\N	\N	\N
 裏腹	うらはら	{相反していること。また、そのさま。逆さま。反対。あべこべ。「気持ちと―な言葉」}	{"〔裏表，反対〕reverse; opposite"}	\N	\N	\N
-恨み	うらみ	{}	{"resentment; grudge; offence"}	\N	\N	\N
 憾む	うらむ	{望みどおりにならず、残念に思う。「機会を逸したことが―・まれる」}	{"to deeply regret; to resent"}	\N	\N	\N
 恨む	うらむ	{ひどい仕打ちをした相手を憎く思う気持ちをもちつづける。「冷たい態度を―・む」}	{"feel bitter"}	\N	\N	\N
 怨む	うらむ	{憎悪を感じる。「親をー」}	{"feel hatred"}	\N	\N	\N
@@ -7763,7 +7771,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 運賃	うんちん	{}	{"freight rates; shipping expenses; fare"}	\N	\N	\N
 運転	うんてん	{}	{"operation; motion; driving"}	\N	\N	\N
 運転手	うんてんしゅ	{}	{drive}	\N	\N	\N
-運動	うんどう	{}	{"motion; exercise"}	\N	\N	\N
 運搬	うんぱん	{}	{"transport; carriage"}	\N	\N	\N
 運命	うんめい	{}	{fate}	\N	\N	\N
 運輸	うんゆ	{}	{transportation}	\N	\N	\N
@@ -7777,6 +7784,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 我が家	わがや	{自分の家。また、自分の家庭。}	{"〔家庭〕one's home; 〔建物〕one's house"}	\N	\N	\N
 輪	わ	{}	{"ring; hoop; circle"}	\N	\N	\N
 煩い	うるさい	{}	{"noisy; loud; fussy"}	\N	{五月蝿い}	\N
+恨み	うらみ	{他からの仕打ちを不満に思って憤り憎む気持ち。怨恨  。遺恨。「あいつには―がある」「―を晴らす」}	{"a grudge (against)〔悪感情〕ill will (against)〔憎しみ〕hatred (of/for)"}	\N	{怨み,憾み}	\N
 分かる	わかる	{}	{"to be understood"}	\N	\N	\N
 分る	わかる	{}	{"be understood"}	\N	\N	\N
 別れ	わかれ	{}	{"parting; separation; farewell; (lateral) branch; fork; offshoot; division; section"}	\N	\N	\N
@@ -8216,7 +8224,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 雑巾	ぞうきん	{}	{"dust cloth"}	\N	\N	\N
 増減	ぞうげん	{}	{"increase and decrease; fluctuation"}	\N	\N	\N
 蔵相	ぞうしょう	{}	{"Minister of Finance"}	\N	\N	\N
-増殖	ぞうしょく	{ふえること。また、ふやすこと。「資本をーする」}	{"increase; multiplication; propagation"}	\N	\N	\N
 増進	ぞうしん	{}	{"promoting; increase; advance"}	\N	\N	\N
 造船	ぞうせん	{}	{shipbuilding}	\N	\N	\N
 増大	ぞうだい	{}	{enlargement}	\N	\N	\N
@@ -8242,6 +8249,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 頭脳	ずのう	{}	{"head; brains; intellect"}	\N	\N	\N
 象	ぞう	{}	{elephant}	\N	\N	\N
 増加	ぞうか	{［名］(スル)物の数量がふえること。また、ふやすこと。増大。増殖。増量。「人口が―する」⇔減少。}	{"increase; addition"}	\N	\N	\N
+増殖	ぞうしょく	{ふえること。また、ふやすこと。増加。増大。増量。「資本をーする」}	{"increase; multiplication; propagation"}	{名,スル}	\N	\N
 図表	ずひょう	{}	{"chart; diagram; graph"}	\N	\N	\N
 滑れる	ずれる	{}	{"slide; slip off"}	\N	\N	\N
 ローマ字	ローマじ	{}	{"romanization; Roman letters"}	\N	\N	\N
@@ -8251,7 +8259,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 中	うち	{ある一定の区域・範囲の中。}	{"out of (a group); inside (a group)"}	\N	\N	\N
 中	なか	{}	{"inside; middle; among"}	\N	\N	\N
 様	よう	{}	{"way; manner; kind; sort; appearance; like; such as; so as to; in order to; so that","〔…らしい〕seems (to be); looks like (e.g. snow is falling); appearantly (e.g. fails)"}	\N	\N	\N
-取り敢えず	とりあえず	{何する間もなく。すぐに。差し当たり。「―応急処置をして、病院へ運ぶ」,ほかのことはさしおいて、まず第一に。なにはさておき。「―母に合格を知らせる」「―お礼まで」}	{"for the time being","first of all"}	\N	\N	\N
 様	さま	{}	{"Mr. or Mrs.; manner; kind; appearance"}	\N	\N	\N
 生臭い	なまぐさい	{}	{"smelling of fish or blood; fish or meat<br />臭い(くさい): stinking<br />面倒臭い(めんどうくさい): bother to do; tiresome"}	\N	\N	\N
 いらっしゃる	いらっしゃる	{「行く」の尊敬語。おいでになる。「休日にはどこへ―・るのですか」,「来る」の尊敬語。おいでになる。「先生が―・った」,「居る」の尊敬語。おいでになる。「明日は家に―・いますか」}	{"go; leave (for France)","come by","be; be in; be at home"}	\N	\N	\N
@@ -8266,6 +8273,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 灰皿	はいさら	{}	{ashtray}	\N	\N	\N
 三日月	みかずき	{}	{"new moon; crescent moon"}	\N	\N	\N
 温める	あたためる	{程よい温度に高める。あたたかくする。あっためる。「冷えた手を―・める」「ミルクを―・める」}	{"〔熱くする〕warm (up); heat (up)","〔大事にしておく〕take care of (nursing; keep)"}	\N	{暖める}	\N
+取り敢えず	とりあえず	{何する間もなく。すぐに。差し当たり。「―応急処置をして、病院へ運ぶ」,ほかのことはさしおいて、まず第一に。なにはさておき。「―母に合格を知らせる」「―お礼まで」}	{"for the time being","first of all"}	{副}	\N	\N
 三日月	みかづき	{}	{"new moon; crescent moon"}	\N	\N	\N
 丈夫	じょうふ	{}	{"hero; gentleman; warrior; manly person; good health; robustness; strong; solid; durable"}	\N	\N	\N
 審判	しんぱん	{}	{"refereeing; trial; judgement; umpire; referee"}	\N	\N	\N
@@ -8350,7 +8358,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 居る	おる	{人が存在する。そこにいる。「海外に何年―・られましたか」,（「おります」の形で、自分や自分の側の者についていう）「いる」の丁寧な言い方。「五時までは会社に―・ります」}	{"be here (polite)","be here (polite)"}	\N	\N	\N
 越す	こす	{ある物の上を通り過ぎて一方から他方へ行く。また、難所や障害となるものを通って、その先へ行く。「塀を―・す」「難関を―・す」「峠を―・す」,「行く」「来る」の意の尊敬語。「どちらへお―・しですか」「またお―・しください」}	{"〔横切る〕cross; 〔通り過ぎる〕pass","come over (here to e.g. the hospital)"}	\N	\N	\N
 流石	さすが	{あることを認めはするが、特定の条件下では、それと相反する感情を抱くさま。そうは言うものの。それはそうだが、やはり。「味はよいが、これだけ多いと―に飽きる」「非はこちらにあるが、一方的に責められると―に腹が立つ」,予想・期待したことを、事実として納得するさま。また、その事実に改めて感心するさま。なるほど、やはり。「一人暮らしは―に寂しい」「―（は）ベテランだ」}	{"as one would expect","good; see ... (we can do it)"}	\N	\N	\N
-餓鬼	がき	{生前の悪行のために餓鬼道に落ち、いつも飢えと渇きに苦しむ亡者。,《食物をがつがつ食うところから》子供を卑しんでいう語。「手に負えないーだ」}	{"〔餓鬼道の亡者〕a starving ghost","〔子供〕a brat"}	\N	\N	\N
 添える	そえる	{主となるもののそばにつける。補助として付け加える。「贈り物に手紙を―・える」「薬味を―・える」「介護の手を―・える」,付き添わせる。付き従わせる。「旅行に案内役を―・える」}	{"〔そばに付けておく〕attach (to)","〔付け加える〕add (to)"}	\N	\N	\N
 其処で	そこで	{前述の事柄を受けて、次の事柄を導く。それで。そんなわけで。「いろいろ意見された。ー考えた」,話題をかえたり、話題をもとにもどしたりすることを示す。さて。}	{"So then; that was why","now; ..; Okay; .."}	\N	\N	\N
 陣	じん	{軍隊を配置して備えること。「背水のー」,軍隊の集結している所。兵営。陣地。陣営。「ーを張る」,いくさ。たたかい。合戦。「大坂夏のー」}	{camp,"a position (in battle)","battle; (ett slag)"}	\N	\N	\N
@@ -8366,6 +8373,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 虎	とら	{}	{"〔動物〕〔雄〕a tiger; 〔雌〕a tigress; 〔子〕a tiger cub","〔酔っぱらい〕a drunk"}	{動物}	\N	\N
 けれども	けれども	{}	{"〔逆の関係を示して〕though; although⇒しかし",〔特別の意味なしに前後を結びつけて〕,〔特別の意味なしに前後を結びつけて〕}	\N	{けれど,けど}	\N
 会長	かいちょう	{}	{"the chairman (of the board of directors)"}	\N	\N	\N
+餓鬼	がき	{"1 生前の悪行のために餓鬼道に落ち、いつも飢えと渇きに苦しむ亡者。",2《食物をがつがつ食うところから》子供を卑しんでいう語。「手に負えないーだ」}	{"〔餓鬼道の亡者〕a starving ghost","〔子供〕a brat"}	\N	\N	\N
 擦る	かする	{}	{"to touch lightly; to take a percentage (from)"}	\N	\N	\N
 方々	かたがた	{}	{"persons; all people; this and that; here and there; everywhere; any way; all sides"}	\N	\N	\N
 日付	かづけ	{}	{"date; dating"}	\N	\N	\N
@@ -8453,11 +8461,11 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 強気	ごうぎ	{}	{"great; grand"}	\N	\N	\N
 応え	ごたえ	{}	{"well worth (e.g. reading); rich in (content); e.g. 遊び＿ well worth playing"}	\N	\N	\N
 数	すう	{}	{"number; (mathematics) function"}	\N	\N	\N
-末	すえ	{}	{"end; close; future; finally; tip; top; trivialities; posterity; youngest child"}	\N	\N	\N
 空く	すく	{ある空間を満たしていた人や物が少なくなって、あきができる。まばらになる。減る。「がらがらに―・いた電車」「道路が―・く」}	{"be less crowded; open; become open; become empty"}	\N	\N	\N
 角	すみ	{}	{"corner; nook"}	\N	\N	\N
 天皇	すめらぎ	{}	{"Emperor of Japan"}	\N	\N	\N
 為る	する	{}	{"do; try; play; practice; cost; serve as; pass; elapse"}	\N	\N	\N
+末	すえ	{"1 （本 (もと) に対して）続いているものの先端の方。末端。「毛の―」","2 今からのち。行く末。将来。「―が思いやられる」","3 一番あとに生まれた子。末っ子。「―は女です」",ある期間の終わりのほう。「今月の―」}	{"〔端，終わり〕(at) the end","〔将来〕the future","〔末っ子〕youngest child","〔端・終わり〕(at) the end (e.g. of September)"}	\N	\N	\N
 空	そら	{頭上はるかに高く広がる空間。天。天空。「鳥のようにーを飛び回りたい」,その人の居住地や本拠地から遠く離れている場所。または、境遇。「異国のー」「旅のー」,心の状態。心持ち。心地。また、心の余裕。「生きたーもない」,それらしく思われるが実際はそうでない、という意を表す。うそ。いつわり。「ー涙」「ー笑い」「ーとぼける」,すっかり覚え込んでいて、書いたものなどを見ないで済むこと。「山手線の駅名をーで言える」}	{sky,"land; place; location;","feelings; emotion","pretending; lie","(learn) by heart; (recite) from memory"}	\N	\N	\N
 戯れる	ざれる	{ふざける。たわむれる。「男女が―・れる」}	{"play around"}	\N	\N	\N
 実	じつ	{}	{"truth; reality; sincerity; fidelity; kindness; faith; substance; essence"}	\N	\N	\N
@@ -8569,29 +8577,24 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 例	れい	{}	{"instance; example; case; precedent; experience; custom; usage; parallel; illustration"}	\N	\N	\N
 禍	わざわい	{災い。ふしあわせ。「―を転じて福となす」⇔福。}	{disaster}	\N	\N	\N
 客人	まろうど	{訪ねて来た人。きゃく。きゃくじん。}	{guests}	\N	{賓,客}	\N
-より	より	{比較の標準・基準を表す。「思ったー若い」,ある事物を、他との比較・対照としてとりあげる意を表す。「僕ー君のほうが金持ちだ」「音楽ー美術の道へ進みたい」,事柄の理由・原因・出自を表す。...がもとになって。...から。...のために。,動作・作用の起点を表す。…から。「午前一〇時―行う」「父―手紙が届いた」「東―横綱登場」,動作の移動・経由する場所を表す。…を通って。…を。…から。}	{"(younger) than (you); (better) than (movies); (looks younger) than (her age); (rather have tea) than (coffee)","even (harder/taller);","as a result of; due to 「河川の汚染より伝染病が発生した」","from (6 o'clock); as of (April); according to","〔出発点，起点〕⇒−からfrom; (depart) from (Haneda); (1k away) from (the park); (within 100m) of (the station)"}	\N	\N	\N
 背負う	せおう	{}	{"be burdened with; carry on back or shoulder"}	\N	\N	\N
 前	せん	{}	{before}	\N	\N	\N
 起こす	おこす	{横になっているものを立たせる。「からだを―・す」,目を覚まさせる。「寝入りばなを―・される」,今までなかったものを新たに生じさせる。「風力を利用して電気を―・す」「波を―・す」,平常と異なる状態や、好ましくない事態を生じさせる。ひきおこす。「革命を―・す」「事故を―・す」,""}	{〔横になったものを立てる〕raise,"〔目を覚まさせる〕wake (up)","〔始める〕start; begin","〔引き起こす〕cause; bring about","〔設立する〕establish; found"}	\N	\N	\N
 行書	ぎょうしょ	{漢字の書体の一。楷書をやや崩した書体で、楷書と草書の中間にあたる。}	{"Semi-cursive script is a cursive style of Chinese characters. Because it is not as abbreviated as cursive; most people who can read regular script can read semi-cursive."}	{書体}	\N	\N
 魚	さかな	{}	{fish}	{動物}	\N	\N
 申	さる	{十二支の9番目。}	{"〔十二支の一つ〕the Monkey (the ninth of the twelve signs of the Chinese zodiac); 〔方角〕west-southwest; west by southwest; 〔時刻〕the hour of the Monkey (4:00 p.m.; or the hours between 3:00 p.m. and 5:00 p.m.)"}	{動物}	\N	\N
-子	し	{十二支の一で、その1番目。}	{"〔十二支の一つ〕the Rat (the first of the twelve signs of the Chinese zodiac); 〔方角〕north; 〔時刻〕the hour of the Rat (midnight or the hours between 11:00 p.m. and 1:00 a.m.)"}	{動物}	\N	\N
-巳	し	{十二支の6番目。}	{"〔十二支の一つ〕the Snake (the sixth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Snake (10:00 a.m. or the hours between 9:00 a.m. and 11:00 a.m.); 〔方角〕south-southeast"}	{動物}	\N	\N
 辰	しん	{十二支の一つで、その5番目。}	{"〔十二支の一つ〕the Dragon (the fifth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Dragon (8:00 a.m. or the hours between 7:00 a.m. and 9:00 a.m.); 〔方角〕east-southeast"}	{動物}	\N	\N
-亥	ぐ	{十二支の12番目。}	{"〔十二支の一つ〕the Boar (the last of the twelve signs of the Chinese zodiac); 〔方角〕north-northwest; 〔時刻〕the hour of the Boar (10:00 p.m. or the hours between 9:00 p.m. and 11:00 p.m.)"}	{動物}	\N	\N
 午	ご	{十二支の7番目。うま。}	{"〔十二支の一つ〕the Horse (the seventh of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Horse (noon or the hours between 11:00 a.m. and 1:00 p.m.); 〔方角〕south"}	{動物}	\N	\N
 竜	たつ	{「りゅう（竜）」に同じ。}	{"a dragon"}	{動物}	\N	\N
 辰	たつ	{十二支の一つで、その5番目。}	{"〔十二支の一つ〕the Dragon (the fifth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Dragon (8:00 a.m. or the hours between 7:00 a.m. and 9:00 a.m.); 〔方角〕east-southeast"}	{動物}	\N	\N
-丑	ちゅう	{十二支の2番目。}	{"〔十二支の一つ〕the Ox (the second of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Ox (2:00 a.m. or the hours between 1:00 a.m. and 3:00 a.m.); 〔方角〕north-northeast"}	{動物}	\N	\N
-寅	とら	{十二支の一つで、その3番目。}	{"〔十二支の一つ〕the Tiger (the third of the twelve signs of the Chinese zodiac); 〔方角〕east-northeast; 〔時刻〕the hour of the Tiger (4:00 a.m. or the hours between 3:00 a.m. and 5:00 a.m.)"}	{動物}	\N	\N
 酉	とり	{十二支の一つで、その10番目。}	{"〔十二支の一つ〕the Cock (the tenth of the twelve signs of the Chinese zodiac); 〔方角〕west; 〔時刻〕the hour of the Cock (6:00 p.m. or the hours between 5:00 p.m. and 7:00 p.m.)"}	{動物}	\N	\N
 豹	ひょう	{}	{panther}	{動物}	\N	\N
 蛍	ほたる	{}	{firefly}	{動物}	\N	\N
 猛虎	もうこ	{}	{"fierce tiger"}	{動物}	\N	\N
-子	ね	{十二支の一で、その1番目。}	{"〔十二支の一つ〕the Rat (the first of the twelve signs of the Chinese zodiac); 〔方角〕north; 〔時刻〕the hour of the Rat (midnight or the hours between 11:00 p.m. and 1:00 a.m.)"}	{動物}	\N	\N
-未	ひつじ	{十二支の8番目。}	{"〔十二支の一つ〕the Sheep; the eighth of the twelve signs of the Chinese Zodiac; 〔時刻〕the hour of the Sheep; 2:00 p.m.; the hours between 1:00 p.m. and 3:00 p.m.; 〔方角〕south-southwest"}	{動物}	\N	\N
 龍	りゅう	{}	{"a dragon"}	{動物}	{竜}	\N
+子	し	{十二支の一で、その1番目。}	{"〔十二支の一つ〕the Rat (the first of the twelve signs of the Chinese zodiac); 〔方角〕north; 〔時刻〕the hour of the Rat (midnight or the hours between 11:00 p.m. and 1:00 a.m.)"}	{動物}	\N	{ね}
+寅	とら	{十二支の一つで、その3番目。}	{"〔十二支の一つ〕the Tiger (the third of the twelve signs of the Chinese zodiac); 〔方角〕east-northeast; 〔時刻〕the hour of the Tiger (4:00 a.m. or the hours between 3:00 a.m. and 5:00 a.m.)"}	{動物}	\N	{いん}
+未	ひつじ	{十二支の8番目。}	{"〔十二支の一つ〕the Sheep; the eighth of the twelve signs of the Chinese Zodiac; 〔時刻〕the hour of the Sheep; 2:00 p.m.; the hours between 1:00 p.m. and 3:00 p.m.; 〔方角〕south-southwest"}	{動物}	\N	{び}
 楷書	かいしょ	{漢字の書体の一。点画を正確に書き、現在、最も標準的な書体とされている。隷書から転じたもので、六朝 (りくちょう) 中期に始まり唐のころ完成した。真書。正書。}	{"Regular script. also called 正楷. is the newest of the Chinese script styles (appearing by the Cao Wei dynasty ca. 200 CE and maturing stylistically around the 7th century); hence most common in modern writings and publications (after the Ming and sans-serif styles; used exclusively in print)."}	{書体}	\N	\N
 楷書体	かいしょたい	{漢字の書体の一。点画を正確に書き、現在、最も標準的な書体とされている。隷書から転じたもので、六朝 (りくちょう) 中期に始まり唐のころ完成した。真書。正書。}	{"Regular script. also called 正楷. is the newest of the Chinese script styles (appearing by the Cao Wei dynasty ca. 200 CE and maturing stylistically around the 7th century); hence most common in modern writings and publications (after the Ming and sans-serif styles; used exclusively in print)."}	{書体}	\N	\N
 行書体	ぎょうしょたい	{漢字の書体の一。楷書をやや崩した書体で、楷書と草書の中間にあたる。}	{"Semi-cursive script is a cursive style of Chinese characters. Because it is not as abbreviated as cursive; most people who can read regular script can read semi-cursive."}	{書体}	\N	\N
@@ -8600,8 +8603,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 篆書	てんしょ	{中国で秦以前に使われた書体。大篆と小篆とがあり、隷書・楷書のもとになった。印章・碑銘などに使用。篆。}	{"a style of writing Chinese characters (mainly used for seals); a tensho hand. The seal script (often called 'small seal' script) is the formal script of the Qín system of writing; which evolved during the Eastern Zhōu dynasty in the state of Qín and was imposed as the standard in areas Qín gradually conquered. Although some modern calligraphers practice the most ancient oracle bone script as well as various other scripts older than seal script found on Zhōu dynasty bronze inscriptions; seal script is the oldest style that continues to be widely practiced."}	{書体}	\N	\N
 隷書	れいしょ	{漢字の書体の一。秦の程邈 (ていばく) が小篆 (しょうてん) を簡略化して作ったものといわれる。漢代に装飾的になり、後世、これを八分 (はっぷん) または漢隷、それ以前のものを古隷といって区別した。現在は一般に八分をさす。→八分}	{"Clerical script; also formerly chancery script; is an archaic style of Chinese calligraphy which evolved in the Warring States period to the Qin dynasty; was dominant in the Han dynasty; and remained in use through the Wei-Jin periods."}	{書体}	\N	\N
 隷書体	れいしょたい	{漢字の書体の一。秦の程邈 (ていばく) が小篆 (しょうてん) を簡略化して作ったものといわれる。漢代に装飾的になり、後世、これを八分 (はっぷん) または漢隷、それ以前のものを古隷といって区別した。現在は一般に八分をさす。→八分}	{"Clerical script; also formerly chancery script; is an archaic style of Chinese calligraphy which evolved in the Warring States period to the Qin dynasty; was dominant in the Han dynasty; and remained in use through the Wei-Jin periods."}	{書体}	\N	\N
-亥	い	{十二支の12番目。}	{"〔十二支の一つ〕the Boar (the last of the twelve signs of the Chinese zodiac); 〔方角〕north-northwest; 〔時刻〕the hour of the Boar (10:00 p.m. or the hours between 9:00 p.m. and 11:00 p.m.)"}	{動物}	\N	\N
-戌	じゅつ	{十二支の11番目。}	{"〔十二支の一つ〕the Dog; the eleventh of the twelve signs of the Chinese zodiac; 〔方角〕west-northwest; 〔時刻〕the hour of the Dog (8:00 p.m. or the hours between 7:00 p.m. and 9:00 p.m.)"}	{動物}	\N	\N
 狛犬	こまいぬ	{}	{"(mythologic) dog"}	{動物}	\N	\N
 鮭	さけ	{}	{bass}	{動物}	\N	\N
 猿	さる	{}	{monkey}	{動物}	\N	\N
@@ -8610,17 +8611,13 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 鯛	たい	{}	{"sea bream"}	{動物}	\N	\N
 鶴	つる	{}	{crane}	{動物}	\N	\N
 鳥	とり	{}	{"bird; fowl; poultry"}	{動物}	\N	\N
-卯	う	{十二支の4番目。}	{"〔十二支の一つ〕the Rabbit (the fourth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Rabbit (6:00 a.m. or the hours between 5:00 a.m. and 7:00 a.m.); 〔方角〕east"}	{動物}	\N	\N
-丑	うし	{十二支の2番目。}	{"〔十二支の一つ〕the Ox (the second of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Ox (2:00 a.m. or the hours between 1:00 a.m. and 3:00 a.m.); 〔方角〕north-northeast"}	{動物}	\N	\N
-未	び	{十二支の8番目。}	{"〔十二支の一つ〕the Sheep; the eighth of the twelve signs of the Chinese Zodiac; 〔時刻〕the hour of the Sheep; 2:00 p.m.; the hours between 1:00 p.m. and 3:00 p.m.; 〔方角〕south-southwest"}	{動物}	\N	\N
-卯	ぼう	{十二支の4番目。}	{"〔十二支の一つ〕the Rabbit (the fourth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Rabbit (6:00 a.m. or the hours between 5:00 a.m. and 7:00 a.m.); 〔方角〕east"}	{動物}	\N	\N
+丑	うし	{十二支の2番目。}	{"〔十二支の一つ〕the Ox (the second of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Ox (2:00 a.m. or the hours between 1:00 a.m. and 3:00 a.m.); 〔方角〕north-northeast"}	{動物}	\N	{ちゅう}
+亥	い	{十二支の12番目。}	{"〔十二支の一つ〕the Boar (the last of the twelve signs of the Chinese zodiac); 〔方角〕north-northwest; 〔時刻〕the hour of the Boar (10:00 p.m. or the hours between 9:00 p.m. and 11:00 p.m.)"}	{動物}	\N	{ぐ}
+卯	う	{十二支の4番目。}	{"〔十二支の一つ〕the Rabbit (the fourth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Rabbit (6:00 a.m. or the hours between 5:00 a.m. and 7:00 a.m.); 〔方角〕east"}	{動物}	\N	{ぼう}
 蛇	み	{}	{"a snake; 〔大蛇〕a serpent"}	{動物}	\N	\N
-巳	み	{十二支の6番目。}	{"〔十二支の一つ〕the Snake (the sixth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Snake (10:00 a.m. or the hours between 9:00 a.m. and 11:00 a.m.); 〔方角〕south-southeast"}	{動物}	\N	\N
 酉	ゆう	{十二支の一つで、その10番目。}	{"〔十二支の一つ〕the Cock (the tenth of the twelve signs of the Chinese zodiac); 〔方角〕west; 〔時刻〕the hour of the Cock (6:00 p.m. or the hours between 5:00 p.m. and 7:00 p.m.)"}	{動物}	\N	\N
-戌	いぬ	{十二支の11番目。}	{"〔十二支の一つ〕the Dog; the eleventh of the twelve signs of the Chinese zodiac; 〔方角〕west-northwest; 〔時刻〕the hour of the Dog (8:00 p.m. or the hours between 7:00 p.m. and 9:00 p.m.)"}	{動物}	\N	\N
 猪	い	{豚の原種で、肉は山鯨 (やまくじら) ・牡丹 (ぼたん) といわれ食用。しし。いのこ。}	{"a wild boar"}	{動物}	\N	\N
 猪	いのしし	{豚の原種で、肉は山鯨 (やまくじら) ・牡丹 (ぼたん) といわれ食用。しし。いのこ。}	{"a wild boar"}	{動物}	\N	\N
-寅	いん	{十二支の一つで、その3番目。}	{"〔十二支の一つ〕the Tiger (the third of the twelve signs of the Chinese zodiac); 〔方角〕east-northeast; 〔時刻〕the hour of the Tiger (4:00 a.m. or the hours between 3:00 a.m. and 5:00 a.m.)"}	{動物}	\N	\N
 午	うま	{十二支の7番目。うま。}	{"〔十二支の一つ〕the Horse (the seventh of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Horse (noon or the hours between 11:00 a.m. and 1:00 p.m.); 〔方角〕south"}	{動物}	\N	\N
 魚	うお	{}	{fish}	{動物}	\N	\N
 申	しん	{十二支の9番目。}	{"〔十二支の一つ〕the Monkey (the ninth of the twelve signs of the Chinese zodiac); 〔方角〕west-southwest; west by southwest; 〔時刻〕the hour of the Monkey (4:00 p.m.; or the hours between 3:00 p.m. and 5:00 p.m.)"}	{動物}	\N	\N
@@ -8656,6 +8653,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 禁酒	きんしゅ	{}	{alcohol-prohibition}	\N	\N	\N
 演舞	えんぶ	{}	{performance}	\N	\N	\N
 丹念	たんねん	{}	{diligence}	\N	\N	\N
+巳	み	{十二支の6番目。}	{"〔十二支の一つ〕the Snake (the sixth of the twelve signs of the Chinese zodiac); 〔時刻〕the hour of the Snake (10:00 a.m. or the hours between 9:00 a.m. and 11:00 a.m.); 〔方角〕south-southeast"}	{動物}	\N	{し}
+戌	いぬ	{十二支の11番目。}	{"〔十二支の一つ〕the Dog; the eleventh of the twelve signs of the Chinese zodiac; 〔方角〕west-northwest; 〔時刻〕the hour of the Dog (8:00 p.m. or the hours between 7:00 p.m. and 9:00 p.m.)"}	{動物}	\N	{じゅつ}
 滑子	ナメコ	{}	{"Nameko; Namekotofsskivling; Pholiota nameko"}	{菌類}	\N	\N
 舞茸	まいたけ	{}	{"maitake; Grifola frondosa; Korallticka"}	{菌類}	\N	\N
 松茸	まつたけ	{}	{"Matsutake; Goliatmusseron"}	{菌類}	\N	\N
@@ -8717,7 +8716,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 押麦	おしむぎ	{蒸した大麦を押しつぶして平たくし、乾かしたもの。米にまぜ、炊いて食べる。}	{"rolled barley"}	\N	\N	\N
 糞	くそ	{動物が、消化器で消化したあと、肛門から排出する食物のかす。大便。ふん。}	{"〔うんこ〕((俗)) shit; 〔牛馬の〕dung⇒だいべん(大便)"}	\N	{屎}	\N
 海藻	かいそう	{}	{"(a kind of) seaweed; (marine) alga (複algae)"}	\N	{海草}	\N
-依る	よる	{動作の主体をだれと指し示す。「市民楽団にー・る演奏」,物事の性質や内容などに関係する。応じる。従う。「時と場合にー・る」「人にー・って感想が違う」「成功は努力いかんにー・る」}	{"〔基づく〕based on; attributed to","depending on; according to"}	\N	{拠る}	\N
 十	じゅう	{}	{"10; ten"}	\N	{拾}	\N
 犬	いぬ	{食肉目イヌ科の哺乳類。嗅覚・聴覚が鋭く、古くから猟犬・番犬・牧畜犬などとして家畜化。多くの品種がつくられ、大きさや体形、毛色などはさまざま。警察犬・軍用犬・盲導犬・競走犬・愛玩犬など用途は広い。,他人の秘密などをかぎ回って報告する者。スパイ。「官憲の―」}	{"a dog; 〔雌犬〕a bitch; a she-dog; 〔猟犬〕a hound","〔スパイ〕a spy; a secret agent"}	{動物}	{狗}	\N
 別居	べっきょ	{夫婦・家族などが別れて住むこと。「単身赴任で家族と―している」⇔同居。}	{"〔夫婦の〕(a) separation; 〔法律上の〕legal [judicial] separation"}	\N	\N	\N
@@ -8745,13 +8743,13 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 家庭科	かていか	{}	{"home economics"}	\N	\N	\N
 せめて	せめて	{不満足ながら、これだけは実現させたいという最低限の願望を表す。少なくとも。十分ではないが、これだけでも。「―声だけでも聞きたい」「―10歳若ければなあ」}	{"at least"}	\N	\N	\N
 利用価値	りようかち	{利用するに足る価値。「―に乏しい作物」}	{"utility value"}	\N	\N	\N
-出て行く	でていく	{}	{"leave; move out; depart"}	\N	{出ていく}	\N
 程々に	ほどほどに	{}	{"moderately; within bounds"}	\N	{程程に}	\N
 程々	ほどほど	{}	{"〜の moderate 〜に moderately; within bounds"}	\N	{程程}	\N
 堂々	どうどう	{}	{"magnificent; grand; impressive"}	\N	{堂堂}	\N
 夜遊び	よあそび	{夜、遊び歩くこと。また、その遊び。「悪友と―する」}	{"go out at night"}	\N	\N	\N
 寝不足	ねぶそく	{寝足りないこと。また、そのさま。睡眠不足。「―な（の）頭で試験に臨む」}	{"lack of sleep"}	\N	\N	\N
 李	すもも	{}	{"Jap/Chinese plum"}	\N	\N	\N
+出て行く	でていく	{}	{"leave; get out; move out; depart"}	\N	{出ていく}	\N
 言い逃れ	いいのがれ	{＿ること。また、その言葉。言い抜け。言い逃げ。「もう―はきかない」「―してもむだだ」}	{"excuse; evasion of responsibility; evading of an issue"}	\N	{言逃れ}	\N
 言い逃れる	いいのがれる	{いひのが・る［ラ下二］うまくごまかして、責任をまぬがれる。言い抜ける。「何とかその場を―・れる」}	{"〔言い逃れをする〕give an evasive answer","equivocate; 〔弁解する〕make excuses"}	\N	{言逃れる}	\N
 一千	いっせん	{}	{"one thousand"}	\N	\N	\N
@@ -8774,7 +8772,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 薄薄	うすうす	{}	{"〔かすかに〕slightly; 〔漠然と〕vaguely"}	\N	{薄々}	\N
 気付く	きづく	{それまで気にとめていなかったところに注意が向いて、物事の存在や状態を知る。気がつく。「誤りに―・く」「忘れ物に―・く」,意識を取り戻す。正気に戻る。気がつく。「―・いたらベッドの上だった」}	{"〔五感により意識する〕notice; become aware ((of)); perceive; be alert〔感づく〕sense; suspect;〔悟る〕realize; discover;","regain sanity; recover your awareness/concounce"}	\N	{気づく}	\N
 売人	ばいにん	{品物を売る人。特に、密売組織などの末端で麻薬や銃器などを売りさばく人。}	{"a (e.g. drug) seller"}	\N	\N	\N
-余り	あまり	{使ったり処理したりしたあとになお残ったもの。残り。余剰。「―の布切れ」「シチューの―を冷凍する」,数量を表す語に付いて、それよりも少し多い意を表す。以上。「百名―の従業員」}	{"〔余った物，残り〕the rest; the remnants; 〔剰余〕the remainder","〔接尾辞として，以上〕more than; moreover"}	\N	\N	{あんまり}
 軽々	かるがる	{}	{"lightly; 〜と easily"}	\N	{軽軽}	\N
 チクる	ちくる	{告げ口をする意の俗語。「仲間の失敗をボスに―・る」}	{"tell ((on)); to tattle (to mommy)"}	\N	\N	\N
 構わない	かまわない	{差し支えない。気にしない。「先に帰っても―◦ないよ」}	{"to not care (if you do this and that)"}	\N	\N	\N
@@ -8833,7 +8830,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 大尉	たいい	{}	{captian}	\N	\N	\N
 和暦	われき	{}	{"Japanese calendar"}	\N	\N	\N
 桜桃	さくらんぼ	{}	{cherry}	\N	\N	\N
-賄賂	わいろ	{}	{bribe}	\N	\N	\N
 鉄瓶	てつびん	{}	{"iron kettle"}	\N	\N	\N
 舐める	なめる	{}	{"to lick"}	\N	\N	\N
 試着	しちゃく	{服などを買う前に、自分のからだに合うかどうか試みに着てみること。「吊 (つ) るしのブレザーを―する」「―室」}	{"try on (e.g. a jacket)"}	\N	\N	\N
@@ -8911,7 +8907,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 真摯	しんし	{まじめで熱心なこと。また、そのさま。「―な態度」「―に取り組む」}	{"〜な sincere"}	\N	\N	\N
 叱責	しっせき	{他人の失敗などをしかりとがめること。「部下をきびしく―する」}	{"(a) scolding; a reprimand"}	\N	\N	\N
 浮腫	むくみ	{むくむこと。また、むくんだもの。ふしゅ。「全身に―がくる」}	{"(a) swelling; a swell; （水腫）dropsy"}	\N	{浮腫み}	\N
-様に	ように	{1.〜に似て，同様に,2.〜の通りに,3.〜するために,4.婉曲 (えんきょく) な命令・希望の意を表す。「開始時刻に遅れないように」「今後ともよろしくご指導くださいますように」}	{"1 similar to; (light) as (a feather); likewise","2 (I did) as (told)","3 in order to; for the sake of; so that; as","4 ～・・・ is combined with the formal form of the verb and expresses a wish"}	\N	\N	\N
 浮腫む	むくむ	{体組織に余分な組織液がたまり、からだの全体、または一部分がはれたようになる。「顔が―・む」}	{"swell; become swollen [dropsical] (▼dropsicalは水腫で)"}	\N	\N	\N
 腫瘍	しゅよう	{}	{"a tumor; ((英)) a tumour"}	\N	\N	\N
 古刹	こさつ	{}	{"a historic old temple"}	\N	{古さつ}	\N
@@ -8935,7 +8930,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 頓挫	とんざ	{}	{"a setback"}	\N	\N	\N
 捻挫	ねんざ	{}	{"a sprain"}	\N	\N	\N
 心筋梗塞	しんきんこうそく	{}	{"〔医学用語〕myocardial [cardiac] infarction"}	\N	\N	\N
-揶揄	やゆ	{からかうこと。なぶること。嘲弄 (ちょうろう) 。「世相を―する」}	{"〜する（からかう）make fun of; make a fool of; （あざける）ridicule"}	\N	{邪揄}	\N
 涙腺	るいせん	{}	{"a lacrimal gland; be moved to tears; start crying"}	\N	\N	\N
 前立腺	ぜんりつせん	{}	{"the prostate (gland)"}	\N	\N	\N
 煎茶	せんちゃ	{}	{sencha}	\N	\N	\N
@@ -8985,8 +8979,8 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 目尻	めじり	{目の耳側の方の端。まなじり。「―にしわを寄せて笑う」⇔目頭 (めがしら) 。}	{"the outer corner of the eye"}	\N	{眥}	\N
 尻込み	しりごみ	{おじけて、あとじさりすること。「滝口をのぞこうとして思わず―した」}	{"〜する 〔ひるむ〕shrink; 〔畏縮する〕flinch ((from danger)); 〔後ずさりする〕recoil"}	\N	{後込み}	\N
 失踪	しっそう	{行方をくらますこと。また、行方が知れないこと。失跡。「事件の後―する」}	{disappearance}	\N	\N	\N
-陰謀	いんぼう	{ひそかにたくらむ悪事。また、そのたくらみ。「―を企てる」「―に加担する」}	{"a plot","an intrigue; 〔共謀〕(a) conspiracy"}	\N	{隠謀}	\N
 死体蹴り	したいげり	{}	{"corpse killing"}	\N	\N	\N
+陰謀	いんぼう	{ひそかにたくらむ悪事。また、そのたくらみ。「―を企てる」「―に加担する」}	{"a plot; an intrigue〔共謀〕(a) conspiracy"}	\N	{隠謀}	\N
 補填	ほてん	{不足・欠損部分を補って埋めること。填補。「赤字を―する」}	{"make up for; cover; compensate"}	\N	{補塡}	\N
 装填	そうてん	{中に詰め込むこと。特に、銃砲に弾丸を込めること。「拳銃 (けんじゅう) に弾丸を―する」}	{"be load (a gun)"}	\N	{装塡}	\N
 溺愛	できあい	{むやみにかわいがること。盲愛。「一人娘を―する」}	{"infatuation ((with)); excessive love ((for))"}	\N	\N	\N
@@ -9011,11 +9005,9 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 色艶	いろつや	{}	{"〔色とつや〕color and luster，((英)) colour and lustre; 〔つや〕luster〔顔色〕(a) complexion〔面白み〕"}	\N	{色つや}	\N
 妖艶	ようえん	{あやしいほどになまめかしく美しいこと。また、そのさま。「―なほほえみ」}	{"〜な fascinating; bewitching"}	\N	{妖婉}	\N
 才媛	さいえん	{高い教養・才能のある女性。才女。「―の誉 (ほま) れが高い」}	{"a talented woman"}	\N	\N	\N
-怨恨	えんこん	{}	{((have,"bear)) a grudge ((against))⇒うらみ(怨み)"}	\N	\N	\N
 長唄	ながうた	{}	{"nagauta music; traditional singing [chanting] to samisen accompaniment"}	\N	{長歌}	\N
 小唄	こうた	{}	{"a traditional ballad sung to samisen accompaniment"}	\N	\N	\N
 淫行	いんこう	{みだらなおこない。}	{indecency}	\N	\N	\N
-咽頭	いんとう	{口腔 (こうこう) 、鼻腔および食道の間の筋肉性の袋状の管。呼吸・嚥下 (えんか) ・発声などの作用をする。}	{"the pharynx ((複 〜es",-rynges))}	\N	\N	\N
 咽喉	いんこう	{}	{"〔のど〕the throat〔要所〕a key position"}	\N	\N	\N
 喉頭	こうとう	{呼吸器の一部。上方は咽頭 (いんとう) 、下方は気管に連なる部分。軟骨に囲まれており、声帯がある。}	{"the larynx ((複 〜es; larynges))"}	\N	\N	\N
 喉元	のどもと	{}	{"the throat"}	\N	\N	\N
@@ -9142,7 +9134,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 出藍	しゅつらん	{}	{"surpassing one's teacher"}	\N	\N	\N
 藍色	あいいろ	{}	{"〜の indigo-blue; deep blue"}	\N	\N	\N
 藍染め	あいぞめ	{藍で糸や布を染めること。また、染めたもの。}	{"indigo dyeing"}	\N	{藍染}	\N
-浄瑠璃	じょうるり	{}	{((recite,"chant)) joruri; the narrative which accompanies a Bunraku puppet show"}	\N	\N	\N
 慄然	りつぜん	{}	{"〜として with terror／with horror"}	\N	\N	\N
 戦慄	せんりつ	{}	{"a shudder; 〜する shudder; shiver"}	\N	\N	\N
 脇腹	わきばら	{}	{"〔横腹〕one's side; 〔特に動物の〕the flank"}	\N	\N	\N
@@ -9176,9 +9167,7 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 守護者	しゅごしゃ	{}	{guardian}	\N	\N	\N
 守護	しゅご	{まもること。「国家を―する」}	{protection}	\N	\N	\N
 蝿	はえ	{}	{"a fly; ＿を叩くswat a fly"}	{動物}	\N	\N
-しまう	しまう	{続いていた物事を、そこで終わりにする。終業する。「仕事を―・う」,終わりになる。終わる。「予定より仕事が早く―・った」「今年は花見をせずに―・った」}	{"keep (e.g. your bankbook safe); put away/back (e.g. toys); close down (e.g. a store)","to do something by accident; to finish completely"}	\N	{仕舞う,終う,了う}	\N
 靭帯	じんたい	{}	{"【解剖】a ligament"}	\N	{靱帯}	\N
-通じる	つうじる	{}	{〔道路などが〕lead,"go ((to)); 〔鉄道・バス・道などが〕run ((from a place to another place; between a place and another place))","〔連絡する〕let someone know〔相手に理解される〕get (point) across; make (oneself) understood;","〔電話が〕reach; get to"}	\N	\N	\N
 総理	そうり	{「内閣総理大臣」の略称。}	{"〔＿大臣〕the Prime Minister; the Premier"}	\N	\N	\N
 失業者	しつぎょうしゃ	{失業している人。失職者。}	{"a person who is out of work","an unemployed person; 〔総称〕the unemployed"}	\N	\N	\N
 税制	ぜいせい	{租税に関する制度。「―改革」}	{"the taxation system"}	\N	\N	\N
@@ -9202,7 +9191,6 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 馬力	ばりき	{}	{"〔動力単位〕horsepower (略HP)"}	\N	\N	\N
 制御	せいぎょ	{}	{"control; 〜装置 a control system; a control device; a control unit"}	\N	{制禦,制馭}	\N
 梃摺る	てこずる	{取り扱いかねて、もてあます。手にあまる。処置に困る。また、解決に手間取る。「いたずらっ子に―・る」「交渉に―・る」}	{"have a hard time (with); have a lot of trouble (e.g. managing)"}	\N	{手子摺る}	\N
-郵便受け	ゆうびんうけ	{配達される郵便物を受け取るために家の入り口などに設ける箱。受け箱。郵便箱}	{"a mailbox; 〔英〕a letter box"}	\N	\N	\N
 投函	とうかん	{郵便物をポストに入れること。「手紙を―する」}	{"〜する（手紙を）mail a letter; drop a letter into a mailbox"}	\N	\N	\N
 時点	じてん	{時の流れの上で、ある一点またはある時期。「今の―では言明できない」「現―」}	{"a point in time"}	\N	\N	\N
 詰まり	つまり	{物が詰まること,話の落ち着くところは。要するに。結局。すなわち。「今までいろいろ述べたが、―それはこういうことになる」}	{"(pillow) is stuffed","in short; in other words; the long and short of it; what it all comes down to; that is to say"}	\N	\N	\N
@@ -9234,11 +9222,169 @@ zほか	zほか	{に添えて}	{"in addition"}	\N	\N	\N
 冓	こう	{}	{"[celery radical]"}	\N	\N	\N
 飴	あめ	{}	{sweets}	\N	\N	\N
 非番	ひばん	{当番でないこと。また、その人。}	{off-duty}	\N	\N	\N
+情状酌量	じょうじょうしゃくりょう	{刑事裁判において、同情すべき犯罪の情状をくみ取って、裁判官の裁量により刑を減軽すること。「―する余地がある」}	{"Extenuation; to lessen or to try to lessen the seriousness or extent of by making partial excuses; mitigation"}	\N	\N	\N
+酌量	しゃくりょう	{事情をくみ取って、処置・処罰などに手ごころを加えること。斟酌 (しんしゃく) 。「情状を―する」}	{"consideration; 〜する take into consideration; make allowance(s) ((for))"}	{名,スル}	\N	\N
+情状	じょうじょう	{実際の事情。実情。「―を考慮する」}	{circumstances}	\N	\N	\N
+別状	べつじょう	{普通と変わった状態。異状。「命に―はない」}	{"injury; in danger of (losing your life); something wrong; damage done"}	\N	\N	\N
+別状はない	べつじょうはない	{}	{"（命に）be in no danger of losing one's life"}	\N	\N	\N
+より	より	{"1 比較の標準・基準を表す。「思ったー若い」","2 ある事物を、他との比較・対照としてとりあげる意を表す。「僕ー君のほうが金持ちだ」「音楽ー美術の道へ進みたい」","3 事柄の理由・原因・出自を表す。...がもとになって。...から。...のために。","4 動作・作用の起点を表す。…から。「午前一〇時―行う」「父―手紙が届いた」「東―横綱登場」",動作の移動・経由する場所を表す。…を通って。…を。…から。}	{"(younger) than (you); (better) than (movies); (looks younger) than (her age); (rather have tea) than (coffee)","even (harder/taller);","as a result of; due to 「河川の汚染より伝染病が発生した」","from (6 o'clock); as of (April); according to","〔出発点，起点〕⇒−からfrom; (depart) from (Haneda); (1k away) from (the park); (within 100m) of (the station)"}	{格助}	\N	\N
+頼り	たより	{何かをするためのよりどころとして、たよっているもの。頼み。「地図を―に家を探す」「兄を―にする」}	{"rely upon"}	\N	\N	\N
+沙汰	さた	{便り。知らせ。音信。「このところなんの―もない」「音―」「無―」}	{〔便り〕}	\N	\N	\N
+尺度	しゃくど	{}	{"scale; linear measure"}	\N	\N	\N
+奢りだ	おごりだ	{}	{"（私の）This is my treat.; It's on me."}	\N	\N	\N
+奢り	おごり	{}	{"〔ぜいたく〕luxury; extravagance","〔ごちそうすること〕a treat; (this is my) treat"}	\N	\N	\N
+浄瑠璃	じょうるり	{}	{"((recite; chant)) joruri; the narrative which accompanies a Bunraku puppet show"}	\N	\N	\N
+余り	あまり	{"1 使ったり処理したりしたあとになお残ったもの。残り。余剰。「―の布切れ」「シチューの―を冷凍する」","2 数量を表す語に付いて、それよりも少し多い意を表す。以上。「百名―の従業員」"}	{"〔余った物，残り〕the rest; the remnants; 〔剰余〕the remainder","〔接尾辞として，以上〕more than; moreover"}	\N	\N	{あんまり}
+部屋	へや	{家の中をいくつかに仕切ったそれぞれの空間。座敷。室。間 (ま) 。「子供の―」,ホテル・アパートなどで、宿泊したり生活したりするための一区画。「この宿でいちばん高い―」「一―予約する」}	{room,"hotel; apartment"}	\N	\N	\N
+出頭	しゅっとう	{}	{"hand oneself in (to the police); appear in court; 〜する appear; present oneself; report oneself"}	\N	\N	\N
+大喜び	おおよろこび	{非常に喜ぶこと。「合格して―する」}	{}	{名,スル}	\N	\N
+組対	そだい	{組織犯罪対策部（警視庁）の略。}	{}	\N	\N	\N
+珊瑚	さんご	{}	{coral}	\N	\N	\N
+鼻が高い	はながたかい	{誇らしい気持ちである。得意である。「りっぱな息子を持って私も―・い」}	{"be proud (as a superior)"}	\N	\N	\N
+悪行	あくぎょう	{人の道に外れた悪い行い。悪事。凶行。「―の限りを尽くす」}	{"evildoing; 〔個々の〕an evil deed"}	\N	\N	{あっこう}
+突破口	とっぱこう	{"1 敵陣の一部を突破して作った攻め口。「―を開く」",困難や障害を乗りこえる手がかり。「和平の―となる首脳会談」}	{"opening for penetration (of an enemy camp)","breakthrough opening (in negotiation)"}	\N	\N	\N
+一石二鳥	いっせきにちょう	{一つの事をして同時に二つの利益・効果をあげること。一挙両得。「―の名案」}	{"'killing two birds with one stone'"}	\N	\N	\N
+立ち回る	たちまわる	{}	{"〔行動する〕conduct oneself; play (one's) cards"}	\N	\N	\N
+優等生	ゆうとうせい	{}	{"〔優秀な生徒〕an honor student"}	\N	\N	\N
+ガサ	がさ	{《「捜す」の語幹「さが」の倒語》家宅捜索のために警官が立ち入ること。「―を食う」「―を入れる」}	{"inspection (at home by the police)"}	\N	\N	\N
+重み	おもみ	{}	{"1〔重量〕(physical) weight","2〔人を威圧するもの〕(abstract) weight; significance; worth"}	\N	\N	\N
+訳無い	わけない	{"1 簡単である。めんどうなことがない。「問題を―・く解いてみせる」","2 たわいない。「所体 (しょてい) つくるも町風に、―・き夜半の松の風、裾吹き返し」"}	{easily,ridiculuous}	\N	\N	\N
+入り込む	はいりこむ	{中へ入る。奥深く入る。潜り込む。忍び込む。「不純物が―・む」「迷路に―・む」}	{"go into (woods); get into (room); ⇒はいる(入る)"}	\N	{入込む}	\N
+愛想を尽かす	あいそをつかす	{あきれて好意や親愛の情をなくす。見限る。「放蕩 (ほうとう) 息子に―・す」}	{"throw out (of the house); lose interest"}	\N	\N	\N
+愛想尽かし	あいそづかし	{相手に対して好意や愛情をなくすこと。また、それを示す言葉や態度。「―を言う」}	{"spiteful words [acts] intended to 「drive a person away [alienate a person /((俗)) turn a person off]"}	\N	\N	\N
+一児	いちじ	{}	{one-year-old}	\N	\N	\N
+高騰	こうとう	{物価などがひどく上がること。騰貴。値上がり。「地価が―する」}	{"a sudden rise; a sharp rise; a skyrocket increase (in price/rent)"}	{名,スル}	{昂騰}	\N
+企業	きぎょう	{}	{"an enterprise（事業）a business（会社）a corporation; a company"}	\N	\N	\N
+実態	じったい	{実際の状態。本当のありさま。実情。事情。「経営の―を調べる」}	{"the actual conditions; the actual circumstances; truth; fact"}	\N	\N	\N
+挺身隊	ていしんたい	{}	{"a volunteer corps"}	\N	\N	\N
+挺身	ていしん	{}	{"volunteered; offered"}	\N	\N	\N
+毎年	まいとし	{としごと。年々。}	{"every year"}	\N	\N	{まいねん}
+蜘蛛	くも	{}	{spider}	\N	\N	\N
+葡萄	ぶどう	{}	{grapes}	\N	\N	\N
+揶揄	やゆ	{からかうこと。なぶること。嘲り。愚弄。嘲弄 (ちょうろう) 。「世相を―する」}	{"〜する（からかう）make fun of; make a fool of; （あざける）ridicule"}	{名,スル}	{邪揄}	\N
+蝸牛	かたつむり	{}	{"a snail"}	{動物}	{カタツムリ}	\N
+苛める	いじめる	{}	{"〔虐待する〕ill-treat; torment; bully〔つらく当たる〕be hard on〔からかう〕tease"}	\N	{虐める}	\N
+苛め	いじめ	{肉体的、精神的に自分より弱いものを、暴力やいやがらせなどによって苦しめること。}	{"(act/problem of) bullying"}	\N	{虐め}	\N
+ドヤ顔	どやがお	{得意顔のこと。自らの功を誇り「どうだ」と自慢している顔。}	{"smirk face"}	\N	{どや顔}	\N
+死んじまえ	しんじまえ	{}	{"drop dead; go to hell; lit. Die you!"}	\N	{死んじ前}	\N
+ヤリマン	やりまん	{}	{"slut; whore"}	\N	\N	\N
+仕方	しかた	{物事をする方法。やり方。手段。「掃除の―」}	{"a way; a method; （…する）how to do"}	\N	\N	\N
+ダサい	ださい	{}	{"frumpy; dowdy; countrified; unrefined; provincial; ((米口)) hickish"}	\N	\N	\N
+胡麻	ごま	{}	{sesame}	\N	\N	\N
+胡桃	くるみ	{}	{walnut}	\N	\N	\N
+発見者	はっけんしゃ	{}	{"a discoverer（遺体の）the person who found the dead body"}	\N	\N	\N
+職務質問	しょくむしつもん	{警察官職務執行法に基づき、警察官が、挙動の不審な者や他人の犯罪事実を知っていると認められる者を呼び止めて質問すること。職質。}	{"questioning ((of a suspect)); a police checkup"}	{名,スル}	\N	\N
+ガセ	がせ	{にせものや、まやかしものなどをいう俗語。「―ねた」}	{"fake; not true"}	\N	\N	\N
+宿す	やどす	{}	{"（妊娠する）be pregnant; conceive; have a child"}	\N	\N	\N
+変わる	かわる	{"1 物事の形やようすなどが今までと違った状態になる。変化する。「顔色が―・る」","2 ある場所・方向から他の場所・方向へ動く。「住まいが―・る」「別の会社に―・る」「風向きが―・る」「席を―・る」","3 普通と比べて異なっている。一般的、標準的なものと違っている。「―・った趣向」「あの人は一風―・っている」（多く「＿った」「＿っている」の形で）"}	{"〔変化する〕change (into/to) undergo a change; shift; turn; be turned; be transformed; （いろいろに）vary","〔変更する，移る〕move; remove","〔普通と違う〕（異なる）be different (from); differ; be different"}	\N	{変る}	\N
+口汚い	くちぎたない	{聞く人が不快に感じるほど、言葉づかいが下品で乱暴であるさま。「人を―・くののしる」}	{"foulmouthed; abusive; bad-mouth; revile"}	\N	{口穢い}	\N
+色んな	いろんな	{《「いろいろな」の音変化》さまざまの。種々の。「―話をする」}	{various}	\N	\N	\N
+アラサー	あらさあ	{"《around thirtyの略》30歳前後の人。→アラフォー"}	{"around thirty person"}	\N	\N	\N
+外食	がいしょく	{}	{"eating out; dining out"}	\N	\N	\N
+錠剤	じょうざい	{}	{"〔球型の〕a pill〔円板状の〕a tablet"}	\N	\N	\N
+巫女	みこ	{}	{"a Shinto priestess（霊媒）a medium; a psychic medium"}	\N	{神子}	{ふじょ}
+市子	いちこ	{神霊・生き霊 (りょう) ・死霊 (しりょう) を呪文を唱えて招き寄せ、その意中を語ることを業とする女性。梓巫 (あずさみこ) 。巫女 (みこ) 。口寄 (くちよ) せ。}	{"a medium"}	\N	\N	\N
+格闘技	かくとうぎ	{}	{"a martial art; a combat sport"}	\N	{挌闘技}	\N
+格技	かくぎ	{一対一で組み合ったり打ち合ったりして勝負する競技。剣道・柔道・相撲・レスリング・ボクシングなど。格闘技。体技。}	{}	\N	{挌技}	\N
+格闘	かくとう	{組み合ってたたかうこと。とっくみあい。くみうち。「―技」「暴漢と―する」}	{"a fight; a scuffle; a grapple"}	{名,スル}	{挌闘}	\N
+眺める	ながめる	{"1 じっと見つめる。感情をこめて、つくづくと見る。「しげしげと人の顔を―・める」",視野に入ってくるもの全体を見る。のんびりと遠くを見る。広く見渡す。「星を―・める」「田園風景を―・める」}	{"〔見つめる〕look at; stare; gaze at","〔見渡す〕glance at; look out on"}	\N	\N	\N
+裏を取る	うらをとる	{確かな証拠や証人を捜し出すなどして、供述・情報などの真偽を確認する。裏付けを取る。「犯人の自白の―・る」}	{"collect evidence; see if (alibi) stands up"}	\N	\N	\N
+通報	つうほう	{情報・ニュースなどを告げ知らせること。また、その知らせ。報告。「警察に―する」「気象―」}	{"a report〔公報〕a bulletin〔内報〕(give; get) a tip"}	\N	\N	\N
+見掛ける	みかける	{}	{"to (happen to) see; to notice; to catch sight of"}	\N	{見かける}	\N
+証言	しょうげん	{"1 ある事柄の証明となるように、体験した事実を話すこと。また、その話。検証。「マスコミに事故の有り様を―する」",法廷などで証人が供述すること。}	{"〜する bear witness (to)","evidence; testimony; 〜する testify (to; against; in favor of); give evidence"}	\N	\N	\N
+持たせる	もたせる	{"1 持つようにしてやる。持つようにさせる。また、受け持たせる。「板前に店を一軒―・せる」「所帯を―・せる」「クラスを―・せる」",保つようにさせる。「この金で今月一杯―・せる」「人工呼吸器で命を―・せる」}	{"〔所持させる〕let (someone) have; let (someone) get hold of〔持って行かせる〕have (someone) bring","〔保たせる〕being kept alive〔負担させる〕be born; be paid"}	\N	{凭せる}	\N
+そっから	そっから	{}	{"from there; thence"}	\N	{そこから}	\N
+煉瓦	れんが	{}	{brick}	\N	{レンガ}	\N
+目的地	もくてきち	{目ざして行こうとする土地。「無事に―に着く」}	{"one's destination"}	\N	\N	\N
+ご心配おかけしました	ごしんぱいおかけしました	{}	{"sorry for worrying (you)"}	\N	\N	\N
+脅かす	おびやかす	{"1 おどかして恐れさせる。こわがらせて従わせる。「刃物で人を―・す」",危険な状態にする。危うくする。「インフレが家計を―・す」}	{〔脅迫する〕⇒おどす(脅す),"〔危うくさせる〕be treatened; be in jeopardy"}	\N	\N	\N
+取り引き	とりひき	{"1 商人と商人、または、商人と客との間で行われる経済行為。「外国企業と―する」「―先」",互いに利益を得られるよう交渉すること。「ライバル会社と裏で―する」}	{"〔商業上の〕a deal; (conduct) a transaction; dealings; a (bank) account; business connection/relation","〔駆け引き〕deal (with criminals); (make a) deal (and agree on passing a bill)"}	\N	{取引}	\N
+取引先	とりひきさき	{}	{"a customer; a client（関係者）a business acquaintance"}	\N	{取り引き先}	\N
+職質	しょくしつ	{「職務質問」の略。}	{"questioning (of a suspect); a police checkup"}	{名,スル}	\N	\N
+大恥	おおはじ	{ひどく面目を失うこと。赤恥。「人前で―をかかされる」}	{"big embarassment"}	\N	\N	\N
+公務執行妨害	こうむしっこうぼうがい	{}	{"interference with a government official in the execution of his duties"}	\N	\N	\N
+彼奴	あいつ	{}	{"〔男〕that fellow [(英) chap] (米口) that guy (英口) that bloke〔女〕that woman"}	\N	\N	\N
+何でも	なんでも	{"1 どうしても。ぜひ。「何が―やりぬこう」「あれは世間に重宝する三光とやらいふ鳥であらう。―刺いてくれう」",［連語］どういうものでも。どういうことでも。「生活用品なら―ある」「頼まれたことは―する」}	{"by all means; everything","〔どれでも〕whatever; anything; any (book)"}	\N	\N	\N
+蝦	えび	{}	{"（車エビ）a prawn（小エビ）a shrimp（イセエビ）a lobster"}	{動物}	{エビ,海老}	\N
+蛸	たこ	{}	{"an octopus"}	{動物}	{章魚,鮹}	\N
+持ち合わせ	もちあわせ	{}	{"〜の〔手持ちの〕on hand〔在庫の〕in stock"}	\N	\N	\N
+持ち合う	もちあう	{互いに持つ。また、双方が分け合って持つ。「荷物を二人して―・う」「足りない分は皆で―・う」}	{"〔互いに持つ〕（分担する）share; shared with"}	\N	{持合う}	\N
+依る	よる	{"1 動作の主体をだれと指し示す。「市民楽団にー・る演奏」",物事の性質や内容などに関係する。応じる。従う。「時と場合にー・る」「人にー・って感想が違う」「成功は努力いかんにー・る」}	{"〔基づく〕based on; attributed to","depending on; according to"}	\N	{拠る}	\N
+苛立ち	いらだち	{思うようにならず気持ちが高ぶること。いらいらする気持ち。焦燥。焦慮。「煮えきらない態度に―を覚える」}	{irritation}	\N	\N	\N
+荒んだ	すさんだ	{}	{degenerated（自堕落な）dissolute（荒れた）wild}	\N	\N	\N
+荒む	すさむ	{心の持ち方・行動などが乱れてきて、ゆとりやおおらかさがなくなる。とげとげした状態になる。「気持ちが―・む」「生活が―・む」}	{"（心が）become hardened of heart; grow wild; get degenerated; lose freshness"}	\N	{進む,遊む}	\N
+知り尽くす	しりつくす	{すべてを知る。すっかり知る。「政界の裏側を―・す」}	{"know inside and out"}	\N	{知尽す,知尽くす,知り尽す}	\N
+招く	まねく	{"1 客として来るように誘う。招待する。招待。「歓迎会に―・かれる」",好ましくない事態を引き起こす。もたらす。「惨事を―・く」「誤解を―・く」}	{"〔手で招き寄せる〕beckon (to)〔招待する〕invite","〔引き起こす〕bring about; cause"}	\N	\N	\N
+たり	たり	{"1 動作や状態を並列して述べる。「泣い―笑っ―する」「とんだり跳ね―する」",2（副助詞的に用いられ）同種の事柄の中からある動作・状態を例示して、他の場合を類推させる意を表す。「車にひかれ―したらたいへんだ」,（終助詞的に用いられ）軽い命令の意を表す。「早く行っ―、行っ―」}	{"〔並述〕and (e.g. on and off; bend and straighten; red and pale)","〔例示〕(i won't hit you) or anything",〔命令〕}	{接助}	\N	\N
+様に	ように	{1.ある事物の性質・状態が他の事物に似ている意を表す。「それは羽の―軽い」「君の―スキーが出来るといいなあ」,2.〜の通りに「社長の言う―した」,3.ある動作・作用の目的・目標である意を表す。「わかりやすくなる―並べかえましょう」,婉曲 (えんきょく) な命令・希望の意を表す。「開始時刻に遅れない―」「今後ともよろしくご指導くださいます―」}	{"〔…に似て・同様に〕similar to; (light) as (a feather); likewise","〔…の通りに〕(I did) as (told)","〔…するために〕in order to; for the sake of; so that; as","～・・・ is combined with the formal form of the verb and expresses a wish"}	{助動}	\N	\N
+引き取る	ひきとる	{"1 手もとに受け取る。引き受けて手もとに置く。「売れ残りを―・る」","2 引き受けて世話をする。「遺児を―・る」","3 息が絶える。死ぬ。「病院で息を―・る」",その場を立ち去る。退く。「奥の間へ―・る」「どうぞお―・りください」}	{"〔返品などを受け取る〕take back〔紛失物などを受け取る〕claim","（世話する）take care of; look after","〔死ぬ〕die (peacefully)","〔退去する〕leave (me alone)（その場を去る）leave; withdraw"}	\N	\N	\N
+臼	うす	{}	{"〔つき臼〕a mortar〔挽き臼〕a set of millstones; a millstone（ひきうす）a mill（手回しの）a hand mill"}	\N	{碓}	\N
+孝	こう	{親を大切にすること。孝行すること。「両親に―を尽くす」}	{"dutiful (towards parents)"}	\N	\N	\N
+仕舞う	しまう	{続いていた物事を、そこで終わりにする。終業する。「仕事を―・う」,終わりになる。終わる。「予定より仕事が早く―・った」「今年は花見をせずに―・った」}	{"keep (e.g. your bankbook safe); put away/back (e.g. toys); close down (e.g. a store)","to do something by accident; to finish completely"}	\N	{仕舞う,終う,了う}	\N
+代物	しろもの	{売買する品物。商品。,人や物を、価値を認めたり、あるいは卑しめたり皮肉ったりするなど、評価をまじえていう語。「めったにない―」「とんだ―をつかまされた」「あれで懲りないなんて、大した―だ」}	{"（物）an article; stuff; a thing","（人）a fellow; a character"}	\N	\N	\N
+何にもならない	なににもならない	{}	{"do not lead to anywhere; be of no use（…しても）It is no use to do; It is no use doing"}	\N	\N	\N
+掛ける	かける	{"1 高い所からぶらさげる。上から下にさげる。垂らす。「すだれを―・ける」「バッグを肩に―・ける」",望ましくないこと、不都合なことなどを他に与える。こうむらせる。負わせる。「苦労を―・ける」「疑いを―・ける」「迷惑を―・ける」}	{〔ぶら下げる〕hang,"〔影響などを及ぼす〕cause; put suspect to"}	\N	{懸ける}	\N
+試飲	しいん	{味見をするなどの目的で、ためしに飲むこと。「新酒を―する」}	{"try drinking; sample"}	{名,スル}	\N	\N
+気晴らし	きばらし	{他の物事に心を向けて気分を晴らすこと。元気回復のための娯楽。気散じ。憂さ晴らし。「―に映画を見る」}	{"〔元気回復のための娯楽〕recreation〔息抜き〕relaxation〔楽しく時間を過ごすこと〕a pastime"}	{名,スル}	\N	\N
+郵便受け	ゆうびんうけ	{配達される郵便物を受け取るために家の入り口などに設ける箱。受け箱。郵便箱。}	{"a mailbox; 〔英〕a letter box"}	\N	\N	\N
+敵を欺くにはまず味方から	てきをあざむくにはまずみかたから	{}	{"in fooling the enemy first deceive your allies"}	\N	\N	\N
+周囲	しゅうい	{もののまわり。ぐるり。また、周辺。「―を木でかこまれた家」,""}	{"〔環境〕the surroundings; the environment〔近所〕(米) the neighborhood; (英) the neighbourhood","〔＿の事情; 付帯状況〕circumstances"}	\N	\N	\N
+一切	いっさい	{"1 全部。すべて。ことごとく。「会の―をとり仕切る」「―を忘れてやり直す」",（あとに打消しの語を伴って）全然。まったく。いっせつ。「謝礼は―受け取らない」「今後―干渉しない」}	{"〔すべて〕all; everything; whole; total","〔全然〕nothing (at all); nothing (what-so-ever)"}	\N	\N	\N
+左遷	させん	{低い地位・官職におとすこと。左降。「閑職に―される」《昔、中国で、右を尊び左を卑しんだところから》}	{"demotion; relegation"}	{名,スル}	\N	\N
+憂き目	うきめ	{つらいこと。苦しい体験。憂さ。「落選の―を見る」「失恋の―にあう」}	{"bitter experience〔不運〕misfortune〔苦難〕hardship"}	\N	\N	\N
+不良	ふりょう	{"1 質・状態などがよくないこと。また、そのさま。「―な（の）品」「発育―」「天候―」",品行・性質がよくないこと。また、その人。「行状 (ぎょうじょう) の―な（の）人」「―少年」}	{"〔よくないこと〕badness; delinquent; inferiority; failure","〔非行者〕a delinquent; a bad boy; a bad girl"}	\N	\N	\N
+体調	たいちょう	{体の調子。体の状態。「―を整える」「―が良い」}	{"one's physical condition; health; feel; shape"}	\N	\N	\N
+無責任	むせきにん	{責任がないこと。「事故についての―を主張する」}	{"irresponsibility; 〜な irresponsible; 〜に irresponsibly"}	{名,形動}	\N	\N
+扇情	せんじょう	{人の感情や欲望をあおること。〜的：感情や情欲をあおりたてるさま。「―なポスター」}	{"suggestive (poster); sensational (newspaper)"}	\N	{煽情}	\N
+一因	いちいん	{一つの原因。「物価上昇の―」}	{"a cause; a factor; a reason"}	\N	\N	\N
+治安	ちあん	{世の中が治まって安らかなこと。社会の秩序・安寧が保たれていること。「―を維持する」}	{"peace and order; (public) order; (public) security"}	\N	\N	\N
+垂れ流す	たれながす	{大小便を無意識のうちに出してしまう。また、排泄した大小便を始末しないで放置する。「―・して歩く」}	{（汚水などを）discharge}	\N	\N	\N
+否む	いなむ	{"1 断る。嫌がる。辞退する。「申し出をむげに―・むわけにもいかない」",否定する。「―・むことのできない事実」}	{"〔拒む・断る〕refuse⇒きょぜつ(拒絶); ことわる(断る)",〔否定する〕deny}	\N	\N	\N
+怨恨	えんこん	{うらむこと。また、深いうらみの心。恨み。遺恨。「―による犯行」}	{"(have/bear) a grudge (against)⇒怨み"}	\N	\N	\N
+手段	しゅだん	{ある事を実現させるためにとる方法。てだて。仕方。方法。「―を講じる」「目的のためには―を選ばない」「強硬―」「生産―」}	{"（方法）a means; a way（措置）a measure; a step"}	\N	\N	\N
+一体	いったい	{"1 一つのからだ。また、同一のからだのようになっていること。同体。「―を成す」「夫婦は―」「三位 (さんみ) ―」","2 全体にならしていうさま。総じて。概して。「―に今年は雪が多い」「日本人は―に表情に乏しい」",強い疑問や、とがめる意を表す。そもそも。「―君は何者だ」}	{"〔一団〕a [one] body; 〔統一体〕(a) unity","〔「一体に」の形で，全般に〕⇒がいして(概して)in general","〔強い疑問〕what on earth (bothers you); why the hell (didn't you come)⇒いったいぜんたい(一体全体)"}	\N	\N	\N
+筋書き	すじがき	{"1 演劇や小説などの大体の内容を書いたもの。あらすじ。「芝居の―」",あらかじめ仕組んだ展開。計画。プラン。構造。「事が―どおりに運ぶ」}	{"〔大要〕an outline; a synopsis; a précis〔小説・劇の〕a plot","〔計画〕a plan; arrangement"}	\N	{筋書}	\N
+見に来る	みにくる	{}	{"to come and see (someone/something); to visit"}	\N	\N	\N
+栄転	えいてん	{今までより高い地位・役職に就くこと。転任をいう尊敬語としても用いる。}	{"a promotion 〜する be transferred to a higher post"}	{名,スル}	\N	\N
+最前線	さいぜんせん	{}	{"〔戦場の〕the front (line; lines)（先頭）the forefront"}	\N	\N	\N
+切らす	きらす	{用意していた物や金を出し切ってなくしてしまう。たやす。「油を―・す」「小銭を―・す」}	{"〔たくわえをなくす〕run out of（物が主語）be out of stock"}	\N	\N	\N
+脅し取る	おどしとる	{脅迫して人から物を取る。「金を―・る」}	{"extort (money) from somebody by threats; blackmail somebody into handing something over."}	\N	\N	\N
+人権問題	じんけんもんだい	{}	{"the human rights question"}	\N	\N	\N
+人権	じんけん	{人間が人間として当然に持っている権利。基本的人権。}	{"human rights; civil liberties"}	\N	\N	\N
+懸ける	かける	{}	{"（賞金を）offer a prize（命を）risk one's life"}	\N	\N	\N
+命がかかってるんだ	いのちがかかってるんだ	{}	{"life is at stake"}	\N	{命が懸かってるんだ}	\N
+命を懸ける	いのちをかける	{命を捨てる覚悟で物事に立ち向かう。「新しい研究に―・ける」「―・けた恋」}	{"risk one's life"}	\N	{命をかける}	\N
+取り返す	とりかえす	{"1 人手に渡ったものを取り戻す。「おもちゃを―・す」「優勝旗を―・す」",再びもとのようにする。もとへ戻す。「元気を―・す」「勉強の遅れを―・す」}	{"get back; take back","recover; catch up; make up"}	\N	{取返す}	\N
+一か八か	いちかばちか	{}	{"all-or-nothing proposition; sink-or-swim; 結果はどうなろうと、運を天に任せてやってみること。のるかそるか。「よし、―勝負してみよう」"}	\N	\N	\N
+礼	れい	{"1 社会秩序を保ち、人間関係を円滑に維持するために守るべき、社会生活上の規範。礼儀作法・制度など。「―にかなったやり方」「―を失する」「―を尽くす」","2 敬意を表すために頭を下げること。おじぎ。「先生に―をする」",謝意を表すこと。また、その言葉。また、謝礼のために贈る金品。「本を借りた―を言う」「世話になった人に―をする」}	{〔礼儀〕etiquette,"〔おじぎ〕a bow〔女性が片足を引いて身を低くするおじぎ〕a curts(e)y","〔感謝〕thanks; gratitude"}	\N	\N	\N
+外れる	はずれる	{"1 掛けたりはめたりした位置から抜け出る。「ボタンが―・れている」「障子が―・れる」","2 目標からそれる。「狙 (ねら) いが―・れる」「くじに―・れる」",予測や期待していたこととは違う結果になる。くいちがう。「当てが―・れる」「予報が―・れる」}	{"〔留めてあるもの・掛けてあるものが離れる〕be disconnected; (handle) come off; (button) is undone","〔外へそれる〕be beside (the point); be off (key); out of (tune)","〔当たらない〕miss (a mark); draw a blank; be proved wrong"}	\N	\N	\N
+運動	うんどう	{からだを鍛え、健康を保つために身体を動かすこと。スポーツ。体操。「肥満防止のために―する」「―競技」}	{"〔体を動かすこと〕exercise〔スポーツ〕sports〔運動競技〕athletics 〜する get [take] exercise; exercise"}	{名,スル}	\N	\N
+咽頭	いんとう	{口腔 (こうこう) 、鼻腔および食道の間の筋肉性の袋状の管。呼吸・嚥下 (えんか) ・発声などの作用をする。}	{"the pharynx (複 〜es; -rynges)"}	\N	\N	\N
+厳粛	げんしゅく	{おごそかで、心が引き締まるさま。「―な儀式」}	{"solemnity; gravity; 〜な (に) solemn(ly); grave(ly)"}	{形動}	\N	\N
+裏側	うらがわ	{裏のほう。また、裏面。裏手。「山脈の―」「事態の―が見えてきた」⇔表側。}	{"back side; hidden side"}	\N	\N	\N
+政界	せいかい	{政治にたずさわる者の社会。政治家の世界。}	{"the political world; political circles"}	\N	\N	\N
+纏まる	まとまる	{"1 ばらばらのものが統一のとれたひとかたまりになる。「引っ越し荷物が―・る」「―・った金額」","2 物事の筋道が立って整う。片付く。「計画が―・る」「考えが―・る」",決まりがつく。互いの意志を一致させる。「交渉が―・る」「縁談が―・る」}	{"〔集まる〕be collected","〔整う〕be well arranged〔統一がある〕be united","〔決着がつく〕be settled"}	\N	\N	\N
+入って来る	はいってくる	{}	{"arriving; incoming"}	\N	{入ってくる}	\N
+箪笥	たんす	{}	{"〔整理箪笥〕a chest of drawers; a wardrobe (米) a bureau; a dresser"}	\N	\N	\N
+正面	まとも	{"1 まっすぐに向かい合うこと。正しく向かい合うこと。また、そのさま。真正面。「―に風を受ける」「―に相手の顔を見る」",まじめなこと。正当であること。また、そのさま。「―な人間になりたい」「これは―な金だ」}	{"〔正面〕〜に 〔じかに〕directly〔まっすぐに〕straight〔面と向かって〕to one's face","〔誤りのないこと〕〜な 〔正直な〕honest〔妥当な〕proper〔ちゃんとした〕respectable"}	{名,形動}	{真面}	\N
+通じる	つうじる	{}	{"1〔道路などが〕lead〔鉄道・バス・道などが〕run (from a place to another place; between a place and another place)","2 go ((to)); 〔鉄道・バス・道などが〕run ((from a place to another place; between a place and another place))","3〔連絡する〕let someone know〔相手に理解される〕get (point) across; make (oneself) understood;","4〔電話が〕reach; get to"}	\N	\N	\N
+在り来たり	ありきたり	{珍しくないこと。ありふれていること。また、そのさま。平凡。並。凡俗。俗。「―な（の）意見」}	{"〜の common（平凡な）ordinary"}	{名,形動}	\N	\N
+突き落とす	つきおとす	{突いて高い所から下へ落とす。「谷底に―・す」}	{"〔突いて〕push (a rock) over/off (a cliff)"}	\N	{突落す,突落とす,突き落す}	\N
+収賄	しゅうわい	{賄賂 (わいろ) を受け取ること。⇔贈賄。}	{"acceptance of a bribe; (米口) graft 〜する take [accept] a bribe; take graft"}	{名,スル}	\N	\N
+贈賄	ぞうわい	{賄賂(わいろ)をおくること。⇔収賄。}	{bribery}	{名,スル}	\N	\N
+賄賂	わいろ	{自分の利益になるようとりはからってもらうなど、不正な目的で贈る金品。袖の下。まいない。裏金。「―を受け取る」}	{"〔贈収賄〕bribery (主に米) graft〔金・物〕a bribe"}	\N	\N	\N
+行き過ぎる	いきすぎる	{}	{"go past; go beyond","（極端になる）go too far"}	\N	\N	\N
+流れ	ながれ	{"1 液体や気体が流れること。また、その状態や、そのもの。「潮の―が速い」「空気の―が悪い」「川の―をせき止める」","2 流れるように連なって動くもの。また、その動き。「人の―に逆らって歩く」「車の―がとどこおる」","3 時間の経過や物事の移り変わり。「時代の―に乗る」「試合の―を読む」",""}	{"a stream; a current (of water/air)","a stream; flow (of cars/people)","（時の）the passage of time","（話の）the flow of talk; a storyline"}	{名}	\N	\N
+壬	みずのえ	{《「水の兄 (え) 」の意》十干の9番目・第九。「壬申」}	{"The Ninth of the ten Celestial or Heavenly Stems"}	\N	\N	{じん}
+窒素	ちっそ	{}	{"nitrogen (記号N)"}	\N	\N	\N
+委嘱	いしょく	{一定期間、特定の仕事を他の人に任せること。委託。「監査役を―する」}	{"〔職権などの委任〕commissioning (of)〔任命〕appointment"}	\N	{名,スル}	\N
+旋回	せんかい	{}	{"revolution; circling"}	{名,スル}	\N	\N
+言葉	ことば	{"1 人が声に出して言ったり文字に書いて表したりする、意味のある表現。言うこと。「友人の―を信じる」",音声や文字によって人の感情・思想を伝える表現法。言語。「日本の―をローマ字で書く」}	{"〔言ったこと〕(make) a statement; a remark〔演説〕a speech","〔言語〕(a) language; speech"}	\N	{詞,辞}	\N
 \.
 
 
 --
--- TOC entry 2287 (class 0 OID 16722)
+-- TOC entry 2293 (class 0 OID 16722)
 -- Dependencies: 174
 -- Data for Name: names; Type: TABLE DATA; Schema: public; Owner: e
 --
@@ -9268,6 +9414,10 @@ COPY names (name, reading, description, origin) FROM stdin;
 大佐	たいさ	声：青野武。雷電の上官。	mgs
 ミヤコ	みやこ	アキラを奉る宗教を指導する老婆。かつてアキラの力を目の当たりにして失明するも、強い感応力で他人の視覚を共有することができる。原作では仮死状態のまま破棄された元ナンバーズ（19号）であり、ネオ東京崩壊後はメインキャラクター達に多くの助言を与え、鉄雄とも直接対決する。劇場版では完全にエキストラ扱いで、モブシーンに数度登場する程度。	akira
 岡本千鶴	おかもと ちづる	誘拐された香織の母親。	akutou
+壬生	みぶ	京都市中京区の地名。友禅染めの染色工場が多い。壬生菜の産地。壬生寺がある。	mixed-locations
+八岐大蛇	やまたのおろち	『日本書紀』での表記。『古事記』では八俣遠呂智と表記している。	mixed-entities
+川島永嗣	かわしま えいじ	埼玉県与野市出身のサッカー選手。スコティッシュ・プレミアシップのダンディー・ユナイテッド所属。日本代表。ポジションはゴールキーパー。	mixed-persons
+はじめしゃちょー	初め社長	YouTubeの人！23歳。疲労のヒーローはじめしゃちょーです。気軽にフォローしてください。UUUM所属。AB型。座右の銘は「お菓子は禁止」	mixed-persons
 石黒孝雄	いしぐろ・たかお	刑事課・課長（警部）	akutou
 杉田智和	すぎた・ともかず	和平ミラーの声優	actors
 大塚明夫	おおつか・あきお	スネークの声優	actors
@@ -9790,7 +9940,7 @@ COPY names (name, reading, description, origin) FROM stdin;
 
 
 --
--- TOC entry 2286 (class 0 OID 16688)
+-- TOC entry 2292 (class 0 OID 16688)
 -- Dependencies: 173
 -- Data for Name: names_metadata; Type: TABLE DATA; Schema: public; Owner: e
 --
@@ -9839,7 +9989,17 @@ akira	アキラ	character
 
 
 --
--- TOC entry 2171 (class 2606 OID 16692)
+-- TOC entry 2294 (class 0 OID 16944)
+-- Dependencies: 175
+-- Data for Name: tmp_table; Type: TABLE DATA; Schema: public; Owner: e
+--
+
+COPY tmp_table (defs, tags) FROM stdin;
+\.
+
+
+--
+-- TOC entry 2177 (class 2606 OID 16692)
 -- Name: meta_pkey; Type: CONSTRAINT; Schema: public; Owner: e; Tablespace: 
 --
 
@@ -9848,7 +10008,7 @@ ALTER TABLE ONLY names_metadata
 
 
 --
--- TOC entry 2173 (class 2606 OID 16729)
+-- TOC entry 2179 (class 2606 OID 16729)
 -- Name: names_pkey; Type: CONSTRAINT; Schema: public; Owner: e; Tablespace: 
 --
 
@@ -9857,7 +10017,7 @@ ALTER TABLE ONLY names
 
 
 --
--- TOC entry 2169 (class 2606 OID 16485)
+-- TOC entry 2175 (class 2606 OID 16485)
 -- Name: 単語発音鍵; Type: CONSTRAINT; Schema: public; Owner: e; Tablespace: 
 --
 
@@ -9866,7 +10026,7 @@ ALTER TABLE ONLY goi
 
 
 --
--- TOC entry 2175 (class 2620 OID 16487)
+-- TOC entry 2181 (class 2620 OID 16487)
 -- Name: impute_missing_pronouncation; Type: TRIGGER; Schema: public; Owner: e
 --
 
@@ -9874,7 +10034,7 @@ CREATE TRIGGER impute_missing_pronouncation BEFORE INSERT ON goi FOR EACH ROW EX
 
 
 --
--- TOC entry 2174 (class 2606 OID 16730)
+-- TOC entry 2180 (class 2606 OID 16730)
 -- Name: names_origin_fkey; Type: FK CONSTRAINT; Schema: public; Owner: e
 --
 
@@ -9883,7 +10043,7 @@ ALTER TABLE ONLY names
 
 
 --
--- TOC entry 2295 (class 0 OID 0)
+-- TOC entry 2302 (class 0 OID 0)
 -- Dependencies: 6
 -- Name: public; Type: ACL; Schema: -; Owner: e
 --
@@ -9894,7 +10054,7 @@ GRANT ALL ON SCHEMA public TO e;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
--- Completed on 2016-02-11 17:30:44 CET
+-- Completed on 2016-02-24 09:33:05 CET
 
 --
 -- PostgreSQL database dump complete

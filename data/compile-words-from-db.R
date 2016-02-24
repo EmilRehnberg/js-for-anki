@@ -14,48 +14,48 @@ SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),
         SELECT * FROM (
           SELECT 単語 AS word,
                  発音 AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE 単語 <> 発音
 
            UNION ALL
           SELECT 発音 AS word,
                  単語 AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE 単語 <> 発音
 
            UNION ALL
           SELECT 発音 AS word,
                  '' AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE 単語 = 発音
 
            UNION ALL
           SELECT UNNEST(alternate_writing) AS word,
                  発音 AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE alternate_writing IS NOT NULL
 
            UNION ALL
           SELECT 単語 AS word,
                  UNNEST(alternate_reading) AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE alternate_reading IS NOT NULL
 
            UNION ALL
           SELECT UNNEST(alternate_reading) AS word,
                  単語 AS reading,
-                 CASE WHEN 和 <> '{}' THEN UNNEST(和) ELSE '' END AS dfn_ja,
-                 CASE WHEN 英 <> '{}' THEN UNNEST(英) ELSE '' END AS dfn_en
+                 mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
+                 mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
             FROM goi
            WHERE alternate_reading IS NOT NULL
       ) dfn_stack
