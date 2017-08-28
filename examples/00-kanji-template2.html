@@ -1,0 +1,45 @@
+<head>
+<meta charset="UTF-8">
+<link href="../stylesheets/dfn-styling.css" rel="StyleSheet" type="text/css">
+<link href="../stylesheets/kanji-templates.css" rel="StyleSheet" type="text/css">
+</head>
+
+<section>
+  <header>
+    <span id="kanji-reader">為</span><span id="kanji-data-writer"></span>
+  </header>
+
+  <article id="base-data-writer"> </article>
+  <article id="bottom">
+    <details id="aux-data-writer">
+      <summary>詳細&mdash;</summary>
+      <dl class="stack with-fields en">
+        <dt>英語</dt>
+        <dd id="eigo-writer"></dd>
+      </dl>
+    </details>
+  </article>
+
+  <p hidden id="wago-reader">為,為す,為る1,為る2</p>
+  <p hidden id="old-wago-reader"></p>
+  <p hidden id="wago-number-reader">四</p>
+
+  <p hidden id="kango-reader">行為,画期</p>
+  <p hidden id="old-kango-reader"></p>
+  <p hidden id="kango-number-reader"></p>
+
+  <p hidden id="namae-reader"></p>
+
+  <p hidden id="chigai-reader"></p>
+  <p hidden id="old-chigai-reader"></p>
+
+  <p hidden id="usage-reader">［常用漢字］［名のり］さだ・しげ・す・すけ・た・ち・なり・ゆき・よし・より</p>
+  <p hidden id="radical-reader">drop ... (steps) ... tail feathers</p>
+  <p hidden id="story-reader">If you see <i>tail feathers</i> and <i>drops</i> of excrement on the <i>steps</i>, I want to <u>do</u> something about it.</p>
+  <p hidden id="audio-reader"></p>
+</section>
+
+<script data-main="../_main.js" src="../_require.js"></script>
+<script>
+  require(["_write-base-kanji-data", "_insert-kanji-reading-hint" ,"append-body-html.js"]);
+</script>
