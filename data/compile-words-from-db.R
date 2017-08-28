@@ -4,7 +4,7 @@ library(tools)
 library(dplyr)
 library(DBI) # needed when run in Rscript environment
 outFile = "_words-data.js"
-builtWordsExtractionQuery <- build_sql("
+builtWordsExtractionQuery <- dbplyr::build_sql("
 SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),
        reading, dfn_ja, dfn_en
  FROM (

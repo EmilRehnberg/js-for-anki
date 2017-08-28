@@ -4,7 +4,7 @@ library(tools)
 library(dplyr)
 library(DBI)
 outFile = "_entity-data.js"
-builtNamesExtractionQuery <- build_sql("
+builtNamesExtractionQuery <- dbplyr::build_sql("
 SELECT name, reading, description, tag, class
   FROM names_metadata
   JOIN names
