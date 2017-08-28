@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(tools)
-library(dplyr)
-library(DBI) # needed when run in Rscript environment
+library(tools, warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr, warn.conflicts = FALSE, quietly = TRUE)
+library(DBI, warn.conflicts = FALSE, quietly = TRUE) # needed when run in Rscript environment
 outFile = "_words-data.js"
 builtWordsExtractionQuery <- dbplyr::build_sql("
 SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),

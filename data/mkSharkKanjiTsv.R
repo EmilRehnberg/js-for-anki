@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-require(magrittr)
+require(magrittr, warn.conflicts = FALSE, quietly = TRUE)
 
 originalTsvPath = "./nhg-shark-kanji.txt"
 outKanjiTsvPath = "./kanji/baseData.tsv"

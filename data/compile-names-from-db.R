@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-library(tools)
-library(dplyr)
-library(DBI)
+library(tools, warn.conflicts = FALSE, quietly = TRUE)
+library(dplyr, warn.conflicts = FALSE, quietly = TRUE)
+library(DBI, warn.conflicts = FALSE, quietly = TRUE)
 outFile = "_entity-data.js"
 builtNamesExtractionQuery <- dbplyr::build_sql("
 SELECT name, reading, description, tag, class
