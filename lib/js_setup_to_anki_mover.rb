@@ -2,7 +2,7 @@ require 'pathname'
 require 'fileutils'
 
 class JsSetUptoAnkiMover
-  OUTPUT_DIR = Pathname.new("~/Documents/Anki/e/collection.media/.").expand_path
+  OUTPUT_DIR = Pathname.new("~/Library/Application Support/Anki2/e/collection.media/.").expand_path
   JS_FILE_REGEX = Regexp.new(/\A\_[\w-]+\.js/)
   REQUIRE_JS_FILE_NAME = "_require.js"
 
