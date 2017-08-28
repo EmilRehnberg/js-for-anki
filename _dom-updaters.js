@@ -1,6 +1,7 @@
 define(["_dom-readers", "_dom-writers", "_tag-builders", "_expression"], function(readers, writers, builders, Expression){
   var domUpdaterFunctions = {
     insertHint: insertHint,
+    insertWritingHint: insertWritingHint,
     replaceWithLength: replaceWithLength,
     replaceRomanWord: replaceRomanWord,
   };
@@ -8,13 +9,19 @@ define(["_dom-readers", "_dom-writers", "_tag-builders", "_expression"], functio
   return domUpdaterFunctions;
 
   function insertHint(expressionText, fullTextId){
+    var hintId = "hint";
     var expression = Expression({ text: expressionText });
     replaceClozedWLength(expression);
-    insertClozedTextHint(expression, fullTextId);
+    buildAndInsertHint(expression, fullTextId, hintId);
   }
 
-  function insertClozedTextHint(expr, fullTextId){
-    var hintId = "hint";
+  function insertWritingHint(expressionText, fullTextId){
+    var hintId = "writing-hint";
+    var expression = Expression({ text: expressionText });
+    buildAndInsertHint(expression, fullTextId, hintId);
+  }
+
+  function buildAndInsertHint(expr, fullTextId, hintId){
     var pHintTag = builders.buildWriterSection(hintId);
 
     writers.appendTags(fullTextId, [pHintTag], "afterEnd");

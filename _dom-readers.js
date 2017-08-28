@@ -5,6 +5,7 @@ var domReadersFunctions = {
   readClassNameElements: readClassNameElements,
   readClozeSpans: readClozeSpans,
   readFirstArticle: readFirstArticle,
+  readHintReader: readHintReader,
   readMain: readMain,
   readTagContents: readTagContents,
   readWords: readWords,
@@ -51,8 +52,18 @@ function readBangHint(){
   }
 }
 
+function readHintReader(){
+  var spans = readClassNameElements("hint-reader");
+  var hint = readHintsFromSpans(spans)[0];
+  return hint;
+}
+
 function readBangHintsFromSpans(spans){
   return [].map.call(spans, readBangHintFromSpan).filter(Boolean);
+}
+
+function readHintsFromSpans(spans){
+  return [].map.call(spans, readHintFromSingleSpan).filter(Boolean);
 }
 
 function readBangHintFromSpan(span){
@@ -61,6 +72,10 @@ function readBangHintFromSpan(span){
   if(hasClozedBangHint(content)){
     return readClozedBangHint(content);
   }
+}
+
+function readHintFromSingleSpan(span){
+  return span.innerHTML
 }
 
 function hasClozedBangHint(content){

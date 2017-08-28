@@ -68,7 +68,14 @@ dfn.person:hover:after[reading=""] {
 #hint dfn:before {
   content: ""; }
 
+#writing-hint dfn:before {
+  content: "〔" attr(reading) "〕"; }
+
 #hint dfn:after {
+  content: attr(ja);
+  color: LawnGreen; }
+
+#writing-hint dfn:after {
   content: attr(ja);
   color: LawnGreen; }
 
