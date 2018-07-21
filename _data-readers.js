@@ -1,15 +1,20 @@
-define(["_words-data", "_entity-data", "_array-helpers"], function(words, names, arrays){
+define(["_words-data", "_entity-data", "_sanskrit-words-data", "_array-helpers"], function(japWords, japNames, sanskritWords, arrays){
   return {
     readMatcingWords: readMatcingWords,
     readMatcingNames: readMatcingNames,
+    readMatcingSanskritWords: readMatcingSanskritWords,
   };
 
   function readMatcingWords(kanji){
-    return matchEntitiesFromData(words, kanji);
+    return matchEntitiesFromData(japWords, kanji);
   }
 
   function readMatcingNames(kanji){
-    return matchEntitiesFromData(names, kanji);
+    return matchEntitiesFromData(japNames, kanji);
+  }
+
+  function readMatcingSanskritWords(devanagari){
+    return matchEntitiesFromData(sanskritWords, devanagari);
   }
 
   function matchEntitiesFromData(data, kanji){

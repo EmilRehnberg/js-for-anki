@@ -1,4 +1,4 @@
-define(["_words-data", "_entity-data"], function(words, names){
+define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, names, sanskritWords){
   var moduleFunctions = {
     buildAnchor: buildAnchor,
     buildBr: buildBr,
@@ -6,6 +6,7 @@ define(["_words-data", "_entity-data"], function(words, names){
     buildLetter: buildLetter,
     buildWordDfnTag: buildWordDfnTag,
     buildNameDfnTag: buildNameDfnTag,
+    buildSanskritDfnTag: buildSanskritDfnTag,
     buildP: buildP,
     buildDelP: buildDelP,
     buildScript: buildScript,
@@ -91,6 +92,19 @@ define(["_words-data", "_entity-data"], function(words, names){
     dfnTag.setAttribute("tag", nameData[2]);
     dfnTag.className = nameData[3];
     dfnTag.innerHTML = "»" + name;
+    return dfnTag;
+  }
+
+  function buildSanskritDfnTag(word){
+    var dfnTag = builder("dfn")();
+    var sanskritWordsData = sanskritWords[word.replace(/ /g, "_")];
+    dfnTag.setAttribute("word", word);
+    if(sanskritWordsData == undefined){ return builder("dfn", word)(); }
+    dfnTag.setAttribute("iast", sanskritWordsData[0]);
+    dfnTag.setAttribute("definition", sanskritWordsData[1]);
+    dfnTag.setAttribute("etymology", sanskritWordsData[2]);
+    dfnTag.className = "sanskrit " + sanskritWordsData[3];
+    dfnTag.innerHTML = "›" + word;
     return dfnTag;
   }
 

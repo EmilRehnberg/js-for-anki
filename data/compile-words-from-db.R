@@ -1,9 +1,6 @@
 #!/usr/bin/env Rscript
 
-library(tools, warn.conflicts = FALSE, quietly = TRUE)
-library(dplyr, warn.conflicts = FALSE, quietly = TRUE)
-library(DBI, warn.conflicts = FALSE, quietly = TRUE) # needed when run in Rscript environment
-outFile = "_words-data.js"
+source("data/compiler-setup.R")
 builtWordsExtractionQuery <- dbplyr::build_sql("
 SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),
        reading, dfn_ja, dfn_en
@@ -63,33 +60,28 @@ SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),
     ) sorted_dfn_stack
   ) dfn_stack_w_rn")
 
-buildWordsData <- function(){
+buildWordsData <- function()
   src_postgres("日本語") %>%
     tbl(builtWordsExtractionQuery) %>%
     collect %>%
     as.data.frame
-}
 
-dataIsUpdated <- function(){TRUE}
+dataIsUpdated <- function() TRUE
 
-buildWordDataRow <- function(row){
+buildWordDataRow <- function(row)
   sprintf('%s: ["%s","%s","%s"],', row[1], row[2], row[3], row[4])
-}
 
-buildWordDataRows <- function(wordsDb){
-  apply(wordsDb, 1, buildWordDataRow)
-}
+buildWordDataRows <- function(wordsDb) apply(wordsDb, 1, buildWordDataRow)
 
-writeNameDataFile <- function(wordsDb, outFilePath){
+writeNameDataFile <- function(wordsDb, outFilePath)
   c("define(function(){ return {",
     buildWordDataRows(wordsDb),
     "}; });"
     ) %>%
     paste(., collapse="\n") %>%
     write(file=outFilePath)
-}
 
-run <- function(){
+run <- function(outFile = "_words-data.js"){
   if(dataIsUpdated()){
     message("  words data is updated, new js-version created")
   }else{

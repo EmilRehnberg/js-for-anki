@@ -59,6 +59,11 @@ dfn.person:hover:after {
 dfn.person:hover:after[reading=""] {
   content: attr(ja) "〈" attr(tag) "〉"; }
 
+dfn.sanskrit { color: #0F9; }
+dfn.sanskrit:after { color: #0A5; }
+dfn.sanskrit:hover:after { content: "〔" attr(iast) "〕" attr(definition) " ETYMOLOGY " attr(etymology) ; }
+dfn.sanskrit:before { content: ""; }
+
 #namae-writer dfn:after {
   content: "〔" attr(reading) "〕"; }
 

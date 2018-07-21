@@ -5,6 +5,7 @@ define(["_dom-readers", "_array-helpers", "_object-helpers", "_tag-builders"], f
     appendTags: appendTags,
     appendToFirstArticle: appendToFirstArticle,
     insertNameDfnToPlaceHolders: insertNameDfnToPlaceHolders,
+    insertSanskritDfnToPlaceHolders: insertSanskritDfnToPlaceHolders,
     readWordsWriteDfnTags: readWordsWriteDfnTags,
     writeDfnTags: writeDfnTags,
     writeLetter: writeLetter,
@@ -117,6 +118,22 @@ define(["_dom-readers", "_array-helpers", "_object-helpers", "_tag-builders"], f
   function insertNameDfnToPlaceHolder(name){
     return function(placeHolder){
       var dfnTag = builders.buildNameDfnTag(name);
+      placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
+    }
+  }
+
+  function insertSanskritDfnToPlaceHolders(words){
+    words.forEach(findSanskritClassesAndInsertDfnTags);
+  }
+
+  function findSanskritClassesAndInsertDfnTags(word){
+    var placeHolders = readers.readClassNameElements(word.replace(" ", "_"));
+    [].forEach.call(placeHolders, insertSanskritDfnToPlaceHolder(word));
+  }
+
+  function insertSanskritDfnToPlaceHolder(word){
+    return function(placeHolder){
+      var dfnTag = builders.buildSanskritDfnTag(word);
       placeHolder.insertAdjacentElement('beforeEnd', dfnTag);
     }
   }

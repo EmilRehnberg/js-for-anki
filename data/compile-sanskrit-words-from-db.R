@@ -1,14 +1,10 @@
 #!/usr/bin/env Rscript
 
 source("data/compiler-setup.R")
-builtNamesExtractionQuery <- dbplyr::build_sql("
-SELECT name, reading, description, tag, class
-  FROM names_metadata
-  JOIN names
-      ON names.origin = names_metadata.table_name")
+builtNamesExtractionQuery <- dbplyr::build_sql("SELECT REPLACE(devanagari, ' ', '_') AS devanagari, iast, definition, etymology, ARRAY_TO_STRING(tags, ',') AS tags FROM words")
 
 buildNamesData <- function()
-  src_postgres("日本語") %>%
+  src_postgres("sanskrit") %>%
     tbl(builtNamesExtractionQuery) %>%
     collect %>%
     as.data.frame
@@ -16,7 +12,7 @@ buildNamesData <- function()
 dataIsUpdated <- function() TRUE
 
 buildNameDataRow <- function(row)
-  sprintf('%s: ["%s", "%s","%s", "%s"],', row[1], row[2], row[3], row[4], row[5])
+  sprintf('%s: ["%s", "%s", "%s", "%s"],', row[1], row[2], row[3], row[4], row[5])
 
 buildNameDataRows <- function(namesDb) apply(namesDb, 1, buildNameDataRow)
 
@@ -28,15 +24,15 @@ writeNameDataFile <- function(namesDb, outFilePath)
     paste(., collapse="\n") %>%
     write(file=outFilePath)
 
-run <- function(outFile = "_entity-data.js"){
+run <- function(outFile = "_sanskrit-words-data.js"){
   if(dataIsUpdated()){
-    message("  names data is updated, new js-version created")
+    message("  sanskrit words data is updated, new js-version created")
   }else{
-    message("  no names updates; nothing new compiled")
+    message("  no sanskrit words updates; nothing new compiled")
     return()
   }
   buildNamesData() %>%
     writeNameDataFile(., outFile)
-  message("  compiled new names data")
+  message("  compiled new sanskrit words data")
 }
 run()

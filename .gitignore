@@ -1,6 +1,7 @@
 data/kanji/baseData.tsv
 data/wordsFromSharkKanji.tsv
 _entity-data.js
+_sanskrit-words-data.js
 _words-data.js
 *~
 *.swp
