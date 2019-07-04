@@ -75,6 +75,7 @@ define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, 
     var dfnTag = builder("dfn")();
     var wordData = words[word];
     if(wordData == undefined){ return buildNameDfnTag(word); }
+    dfnTag.setAttribute("lang", "ja");
     dfnTag.setAttribute("word", word);
     dfnTag.setAttribute("reading", wordData[0]);
     dfnTag.setAttribute("ja", wordData[1]);
@@ -85,6 +86,7 @@ define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, 
   function buildNameDfnTag(name){
     var dfnTag = builder("dfn")();
     var nameData = names[name];
+    dfnTag.setAttribute("lang", "ja");
     dfnTag.setAttribute("name", name);
     if(nameData == undefined){ return builder("dfn", name)(); }
     dfnTag.setAttribute("reading", nameData[0]);
@@ -100,6 +102,7 @@ define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, 
     var sanskritWordsData = sanskritWords[word.replace(/ /g, "_")];
     dfnTag.setAttribute("word", word);
     if(sanskritWordsData == undefined){ return builder("dfn", word)(); }
+    dfnTag.setAttribute("lang", "sa");
     dfnTag.setAttribute("iast", sanskritWordsData[0]);
     dfnTag.setAttribute("definition", sanskritWordsData[1]);
     dfnTag.setAttribute("etymology", sanskritWordsData[2]);
@@ -125,12 +128,13 @@ define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, 
     return builder("script", content)();
   }
 
-  function buildDetailsTag(detailsText, summaryText){
+  function buildDetailsTag(detailsText, summaryText, lang="en"){
     var detailsElement = builder("details", detailsText)();
     if (Boolean(summaryText)){
       var summaryElement = builder("summary", summaryText)();
       detailsElement.insertAdjacentElement('afterBegin', summaryElement);
     }
+    detailsElement.setAttribute("lang", lang);
     return detailsElement;
   }
 
@@ -192,4 +196,3 @@ define(["_words-data", "_entity-data", "_sanskrit-words-data"], function(words, 
     ];
   }
 });
-
