@@ -33,27 +33,27 @@ SELECT CONCAT(word, CASE WHEN rn <> 1 THEN rn ELSE NULL END),
            WHERE 単語 = 発音
 
            UNION ALL
-          SELECT UNNEST(alternate_writing) AS word,
+          SELECT t.word,
                  発音 AS reading,
                  mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
                  mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
-            FROM goi
+            FROM goi LEFT JOIN LATERAL UNNEST(alternate_writing) AS t(word) ON true
            WHERE alternate_writing IS NOT NULL
 
            UNION ALL
           SELECT 単語 AS word,
-                 UNNEST(alternate_reading) AS reading,
+                 t.reading,
                  mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
                  mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
-            FROM goi
+            FROM goi LEFT JOIN LATERAL UNNEST(alternate_reading) AS t(reading) ON true
            WHERE alternate_reading IS NOT NULL
 
            UNION ALL
-          SELECT UNNEST(alternate_reading) AS word,
+          SELECT t.word,
                  単語 AS reading,
                  mix_definitions_and_tags(ROW(和, tags)) AS dfn_ja,
                  mix_definitions_and_tags(ROW(英, tags)) AS dfn_en
-            FROM goi
+            FROM goi LEFT JOIN LATERAL UNNEST(alternate_reading) AS t(word) ON true
            WHERE alternate_reading IS NOT NULL
       ) dfn_stack
   ORDER BY word, reading, dfn_ja, dfn_en
